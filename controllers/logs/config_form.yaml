@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: 'winter.sso::lang.models.log.label'
+
+# Model Form Field configuration
+form: $/winter/sso/models/log/fields.yaml
+
+# Model Class name
+modelClass: Winter\SSO\Models\Log
+
+# Default redirect location
+defaultRedirect: winter/sso/logs
+
+# Create page
+create:
+    title: backend::lang.form.create_title
+    redirect: winter/sso/logs/update/:id
+    redirectClose: winter/sso/logs
+
+# Update page
+update:
+    title: backend::lang.form.update_title
+    redirect: winter/sso/logs
+    redirectClose: winter/sso/logs
+
+# Preview page
+preview:
+    title: backend::lang.form.preview_title

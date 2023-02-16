@@ -1,0 +1,27 @@
+{
+    "name": "winter/wn-sso-plugin",
+    "type": "winter-plugin",
+    "description": "Adds support for OAuth-based Single Sign On (SSO) to the Winter CMS backend module through the use of Laravel Socialiate.",
+    "homepage": "https://github.com/wintercms/wn-sso-plugin",
+    "keywords": ["winter", "wintercms", "laravel", "socialite", "sso", "oauth", "facebook", "twitter", "google", "linkedin", "github", "gitlab", "bitbucket"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Luke Towers",
+            "email": "wintercms@luketowers.ca"
+        },
+        {
+            "name": "Winter CMS Maintainers",
+            "homepage": "https://wintercms.com",
+            "role": "Maintainer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/wintercms/wn-sso-plugin/issues",
+        "discord": "https://discord.gg/D5MFSPH6Ux",
+        "source": "https://github.com/wintercms/wn-sso-plugin"
+    },
+    "require": {
+        "laravel/socialite": "~5.3"
+    }
+}

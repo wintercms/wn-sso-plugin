@@ -1,0 +1,42 @@
+# ===================================
+#  List Column Definitions
+# ===================================
+
+columns:
+    created_at:
+        label: 'winter.sso::lang.models.general.created_at'
+        type: datetime
+        searchable: true
+        sortable:
+    provider:
+        label: winter.sso::lang.models.log.provider
+        type: text
+        searchable: true
+        sortable: true
+    action:
+        label: winter.sso::lang.models.log.action
+        type: text
+        searchable: true
+        sortable: true
+    user_email:
+        label: winter.sso::lang.models.log.user
+        type: partial
+        path: $/winter/sso/models/log/column.user.php
+        clickable: true
+    ip:
+        label: winter.sso::lang.models.log.ip
+        type: text
+        searchable: true
+        sortable: true
+    provided_id:
+        label: winter.sso::lang.models.log.provided_id
+        type: text
+        sortable: true
+        searchable: true
+        invisible: true
+    provided_email:
+        label: winter.sso::lang.models.log.provided_email
+        type: text
+        sortable: true
+        searchable: true
+        invisible: true

@@ -1,0 +1,34 @@
+# Google SSO Setup Instructions
+
+>**@TODO**: Update instructions to match latest versions of Google tooling.
+
+<div class="callout callout-info no-subheader">
+    <div class="header">
+        <i class="icon-info"></i>
+        <h3>How to configure</h3>
+    </div>
+    <div class="content">
+        <ol>
+            <li>Go to <a target="_blank" href="https://console.developers.google.com/project">https://console.developers.google.com/project</a>
+            <li>Create a new project and call it whatever you want (ex: OctoberOAUTH)</li>
+            <li>Once the project was created, go to:
+                <ul>
+                    <li><strong>API Manager</strong></li>
+                    <li><strong>Credentials</strong></li>
+                    <li><strong>Create credentials</strong></li>
+                    <li><strong>OAuth client ID</strong></li>
+                </ul>
+            </li>
+            <li>Configure <strong>"consent screen"</strong>(<em>if necessary</em>)</li>
+            <li>On <strong>"Create client ID"</strong> screen, select <strong>"Web application"</strong></li>
+            <li>Fill:
+                <ul>
+                    <li><strong>Authorized JavaScript origins:</strong> <span style="color:green"><?= URL::to('') ?></span> (you can leave this field blank if you want)</li>
+                    <li><strong>Authorized redirect URIs:</strong> <span style="color:green"><?= route('winter.sso.redirect', ['provider' => 'google']); ?></span></li>
+                </ul>
+            </li>
+            <li>Click <strong>Create</strong>; a popup will appear with the <strong>"Here is your client ID"</strong> and <strong>"Here is your client secret"</strong>, please, copy and paste in the fields below<br />(now you can close Google Developer Console window)</strong>
+            <li>Save this form, and you're ready to login with your Google account.</li>
+        </ol>
+    </div>
+</div>
