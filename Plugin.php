@@ -88,7 +88,7 @@ class Plugin extends PluginBase
                 return $model->metadata['winter.sso'][$provider]['id'] ?? null;
             });
             $model->addDynamicMethod('setSsoId', function (string $provider, string $id) use ($model) {
-                $metadata = $model->metadata;
+                $metadata = $model->metadata ?? [];
                 $metadata['winter.sso'][$provider]['id'] = $id;
                 $model->metadata = $metadata;
             });
