@@ -12,6 +12,8 @@ return [
     | When only one provider is enabled, the login page will be redirected
     | to the provider's login page.
     |
+    | @TODO: Implement this
+    |
     */
 
     'prevent_native_auth' => env('SSO_PREVENT_NATIVE_AUTH', false),
@@ -35,6 +37,37 @@ return [
         // 'twitter',
         // 'twitter-oauth-2',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Allow Registration
+    |--------------------------------------------------------------------------
+    |
+    | If true, will allow users to register for an account using a configured
+    | SSO provider. If false, will only allow existing users to login.
+    |
+    | @TODO: Implement this
+    |
+    */
+
+    'allow_registration' => env('SSO_ALLOW_REGISTRATION', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Role for New Users
+    |--------------------------------------------------------------------------
+    |
+    | The default role code to assign to new users that register using SSO. If
+    | null, no role will be assigned. The value must be a valid role code.
+    | The winter.sso.user.beforeRegister event is also available.
+    |
+    | Example: 'default_role' => \Backend\Models\UserRole::CODE_PUBLISHER,
+    |
+    | @TODO: Implement this
+    |
+    */
+
+    'default_role' => null,
 
     /*
     |--------------------------------------------------------------------------

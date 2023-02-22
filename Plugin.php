@@ -10,19 +10,20 @@ use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
+use View;
 
 /**
  * SSO Plugin Information File
  * @TODO:
- * - Add backend configuration for providers
+ * - Add backend DB configuration for providers (and all settings)
+ * - Add backend configuration for the user to set their SSO integrations
  */
 class Plugin extends PluginBase
 {
     /**
      * Flag that allows this plugin to run on protected routes, required to extend the auth controller.
-     * @NOTE: Not required until we actually implement extension of the auth controller
      */
-    // public $elevated = true;
+    public $elevated = true;
 
     /**
      * Returns information about this plugin.
@@ -32,8 +33,8 @@ class Plugin extends PluginBase
         return [
             'name'        => 'winter.sso::lang.plugin.name',
             'description' => 'winter.sso::lang.plugin.description',
-            'author'      => 'Winter',
-            'icon'        => 'icon-leaf',
+            'author'      => 'Winter CMS',
+            'icon'        => 'icon-lock',
         ];
     }
 
@@ -101,6 +102,7 @@ class Plugin extends PluginBase
     public function boot(): void
     {
         $this->configureProviders();
+        $this->extendAuthController();
     }
 
     /**
@@ -122,12 +124,36 @@ class Plugin extends PluginBase
             }
 
             $config = array_merge([
-                'redirect' => route('winter.sso.callback', ['provider' => $provider]),
+                'redirect' => Backend::url('winter/sso/handle/callback/' . $provider),
             ], $config);
 
             // Set the service configuration for the provider
             Config::set("services.{$provider}", $config);
         }
+    }
+
+    /**
+     * Extend the auth controller to add the SSO login buttons.
+     */
+    protected function extendAuthController(): void
+    {
+        // Extend the signin view to add the SSO buttons for the enabled providers
+        Event::listen('backend.auth.extendSigninView', function ($controller) {
+            $buttonsHtml = '';
+            foreach (Config::get('winter.sso::enabled_providers', []) as $provider) {
+                $providerName = Lang::get("winter.sso::lang.providers.$provider");
+                $buttonsHtml .= View::make("winter.sso::btn.provider", [
+                    'logoUrl' => Url::asset('/plugins/winter/sso/assets/images/' . $provider . '.svg'),
+                    'logoAlt' => Lang::get('winter.sso::lang.provider_btn.alt_text', ['provider' => $providerName]),
+                    'url' => Backend::url('winter/sso/handle/redirect/' . $provider),
+                    'label' => Lang::get('winter.sso::lang.provider_btn.label', ['provider' => $providerName]),
+                ]);
+            }
+
+            if (!empty($buttonsHtml)) {
+                return $buttonsHtml;
+            }
+        });
     }
 
     /**

@@ -25,4 +25,17 @@ return [
             'provided_email' => 'Provided Email',
         ],
     ],
+    'providers' => [
+        'bitbucket' => 'Bitbucket',
+        'facebook' => 'Facebook',
+        'github' => 'Github',
+        'gitlab' => 'GitLab',
+        'google' => 'Google',
+        'linkedin' => 'LinkedIn',
+        'twitter' => 'Twitter',
+    ],
+    'provider_btn' => [
+        'label' => 'Sign in with :provider',
+        'alt_text' => ':provider logo',
+    ],
 ];
