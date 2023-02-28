@@ -50,7 +50,7 @@ return [
     |
     */
 
-    'allow_registration' => env('SSO_ALLOW_REGISTRATION', true),
+    'allow_registration' => env('SSO_ALLOW_REGISTRATION', false),
 
     /*
     |--------------------------------------------------------------------------
