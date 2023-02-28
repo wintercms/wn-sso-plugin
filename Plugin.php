@@ -6,6 +6,7 @@ use Backend;
 use Backend\Models\User;
 use Backend\Models\UserRole;
 use Config;
+use Event;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
 use System\Classes\PluginBase;
