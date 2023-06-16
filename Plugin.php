@@ -12,6 +12,8 @@ use Laravel\Socialite\SocialiteServiceProvider;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
 use View;
+use Lang;
+use Url;
 
 /**
  * SSO Plugin Information File
