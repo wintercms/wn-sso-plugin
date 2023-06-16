@@ -16,6 +16,7 @@ use System\Classes\UpdateManager;
 use Winter\SSO\Models\Log;
 use Winter\Storm\Auth\AuthenticationException;
 use Winter\Storm\Auth\Manager as AuthManager;
+use Backend;
 
 /**
  * Handle SSO Backend Controller
