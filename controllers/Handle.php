@@ -26,7 +26,7 @@ class Handle extends Controller
     /**
      * Defines a collection of actions available without authentication.
      */
-    protected array $publicActions = [
+    protected $publicActions = [
         'callback',
         'redirect',
     ];

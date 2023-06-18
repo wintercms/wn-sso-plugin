@@ -7,7 +7,7 @@ columns:
         label: 'winter.sso::lang.models.general.created_at'
         type: datetime
         searchable: true
-        sortable:
+        sortable: true
     provider:
         label: winter.sso::lang.models.log.provider
         type: text
@@ -23,6 +23,7 @@ columns:
         type: partial
         path: $/winter/sso/models/log/column.user.php
         clickable: true
+        invisible: true
     ip:
         label: winter.sso::lang.models.log.ip
         type: text
@@ -39,4 +40,4 @@ columns:
         type: text
         sortable: true
         searchable: true
-        invisible: true
+        invisible: false
