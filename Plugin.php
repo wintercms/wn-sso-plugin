@@ -140,13 +140,20 @@ class Plugin extends PluginBase
      */
     protected function extendAuthController(): void
     {
+        // Extend the auth controller to add the SSO login buttons only if the native auth is disabled
+        if (Config::get('winter.sso::prevent_native_auth', false))  {
+            \Backend\Controllers\Auth::extend(function ($controller) {
+                $controller->addViewPath(plugins_path('winter/sso/controllers/auth/prevent_native'));
+            });
+        }
+
         // Extend the signin view to add the SSO buttons for the enabled providers
         Event::listen('backend.auth.extendSigninView', function ($controller) {
             $buttonsHtml = '';
             foreach (Config::get('winter.sso::enabled_providers', []) as $provider) {
                 $providerName = Lang::get("winter.sso::lang.providers.$provider");
                 $buttonsHtml .= View::make("winter.sso::btn.provider", [
-                    'logoUrl' => Url::asset('/plugins/winter/sso/assets/images/' . $provider . '.svg'),
+                    'logoUrl' => Url::asset('/plugins/winter/sso/assets/images/providers/' . $provider . '.svg'),
                     'logoAlt' => Lang::get('winter.sso::lang.provider_btn.alt_text', ['provider' => $providerName]),
                     'url' => Backend::url('winter/sso/handle/redirect/' . $provider),
                     'label' => Lang::get('winter.sso::lang.provider_btn.label', ['provider' => $providerName]),
