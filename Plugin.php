@@ -141,14 +141,9 @@ class Plugin extends PluginBase
     protected function extendAuthController(): void
     {
         // Extend the auth controller to add the SSO login buttons only if the native auth is disabled
-        if(Config::get('winter.sso::prevent_native_auth'))  {
-            Event::listen('backend.page.beforeDisplay', function ($controller, $action) {
-                if(!$controller instanceof \Backend\Classes\Controller) {
-                    return;
-                }
-                if ($action == 'signin') {
-                    $controller->addViewPath(plugins_path('winter/sso/views/auth'));
-                }
+        if (Config::get('winter.sso::prevent_native_auth', false))  {
+            \Backend\Controllers\Auth::extend(function ($controller) {
+                $controller->addViewPath(plugins_path('winter/sso/controllers/auth/prevent_native'));
             });
         }
 
