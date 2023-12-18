@@ -2,7 +2,7 @@
 const config = require('../../winter/tailwindui/tailwind.config.js');
 
 config.content = [
-    './partials/**/*.{php,htm}',
+    './views/**/*.{php,htm}',
     './assets/src/js/**/*.{js,vue}',
 ];
 
