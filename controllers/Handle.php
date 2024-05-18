@@ -26,7 +26,7 @@ class Handle extends Controller
     /**
      * Defines a collection of actions available without authentication.
      */
-    protected array $publicActions = [
+    protected $publicActions = [
         'callback',
         'redirect',
     ];
@@ -65,9 +65,9 @@ class Handle extends Controller
         // or backend or even both. If event is used follow naming conventions from in progress
         // issues
 
-        $ssoUser = Socialite::driver($provider)->user();
-
         try {
+            $ssoUser = Socialite::driver($provider)->user();
+
             // @TODO: Protection against service saying that root@mydomain.com is authenticated
             // - First need to know if SSO is enabled for current auth manager
             // - need to know if the user has to explicitly enable it for their account or not,
