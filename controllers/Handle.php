@@ -68,7 +68,7 @@ class Handle extends Controller
             $ssoUser = Socialite::driver($provider)->user();
         } else {
             // there was an error
-            throw new AuthenticationException(var_export(Request::all(), true));
+            throw new AuthenticationException(sprintf("%s: %s", Request::input('error'), Request::input('error_description')));
         }
 
         try {
