@@ -96,6 +96,14 @@ class Plugin extends PluginBase
                 $metadata['winter.sso'][$provider]['id'] = $id;
                 $model->metadata = $metadata;
             });
+            $model->addDynamicMethod('getSsoToken', function (string $provider) use ($model) {
+                return $model->metadata['winter.sso'][$provider]['token'] ?? null;
+            });
+            $model->addDynamicMethod('setSsoToken', function (string $provider, string $token) use ($model) {
+                $metadata = $model->metadata ?? [];
+                $metadata['winter.sso'][$provider]['token'] = $token;
+                $model->metadata = $metadata;
+            });
         });
     }
 

@@ -64,10 +64,9 @@ class Handle extends Controller
         // user registration themselves. Would like plugin to be able to handle frontend
         // or backend or even both. If event is used follow naming conventions from in progress
         // issues
+        $ssoUser = Socialite::driver($provider)->user();
 
         try {
-            $ssoUser = Socialite::driver($provider)->user();
-
             // @TODO: Protection against service saying that root@mydomain.com is authenticated
             // - First need to know if SSO is enabled for current auth manager
             // - need to know if the user has to explicitly enable it for their account or not,
@@ -99,6 +98,13 @@ class Handle extends Controller
         ) {
             // @TODO: Check if request / user is allowed to associate this account to this provider's ID
             $user->setSsoId($provider, $ssoUser->getId());
+            $user->save();
+        }
+        if (
+            $ssoUser->token
+            && $user->getSsoToken($provider) !== $ssoUser->token
+        ) {
+            $user->setSsoToken($provider, $ssoUser->token);
             $user->save();
         }
 
