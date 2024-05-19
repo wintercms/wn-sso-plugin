@@ -160,7 +160,8 @@ class Handle extends Controller
             Flash::error("You are already logged in. Please log out first.");
             return Redirect::back();
         }
+        $scopes = Config::get('services.' . $provider . '.scopes', []);
 
-        return Socialite::driver($provider)->redirect();
+        return Socialite::driver($provider)->scopes($scopes)->redirect();
     }
 }
