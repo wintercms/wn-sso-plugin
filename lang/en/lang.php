@@ -32,7 +32,7 @@ return [
         'gitlab' => 'GitLab',
         'google' => 'Google',
         'linkedin' => 'LinkedIn',
-        'linkedin-openid' => 'LinkedIn OpenID',
+        'linkedin-openid' => 'LinkedIn (OpenID)',
         'twitter' => 'Twitter',
     ],
     'provider_btn' => [
