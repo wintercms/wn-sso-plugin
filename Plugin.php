@@ -7,13 +7,13 @@ use Backend\Models\User;
 use Backend\Models\UserRole;
 use Config;
 use Event;
+use Lang;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
-use View;
-use Lang;
 use Url;
+use View;
 
 /**
  * SSO Plugin Information File
@@ -150,9 +150,10 @@ class Plugin extends PluginBase
         // Extend the signin view to add the SSO buttons for the enabled providers
         Event::listen('backend.auth.extendSigninView', function ($controller) {
             $buttonsHtml = '';
+
             foreach (Config::get('winter.sso::enabled_providers', []) as $provider) {
                 $providerName = Lang::get("winter.sso::lang.providers.$provider");
-                $buttonsHtml .= View::make("winter.sso::btn.provider", [
+                $buttonsHtml .= View::make("winter.sso::buttons.provider", [
                     'logoUrl' => Url::asset('/plugins/winter/sso/assets/images/providers/' . $provider . '.svg'),
                     'logoAlt' => Lang::get('winter.sso::lang.provider_btn.alt_text', ['provider' => $providerName]),
                     'url' => Backend::url('winter/sso/handle/redirect/' . $provider),
@@ -160,8 +161,10 @@ class Plugin extends PluginBase
                 ]);
             }
 
+            $controller->addCss('/plugins/winter/sso/assets/dist/css/sso.css', 'Winter.SSO');
+
             if (!empty($buttonsHtml)) {
-                return $buttonsHtml;
+                echo $buttonsHtml;
             }
         });
     }
