@@ -6,7 +6,11 @@ fields:
     name:
         label: 'winter.sso::lang.models.provider.name'
         type: dropdown
+        emptyOption: 'winter.sso::lang.models.provider.empty_option'
         span: left
+    scopes:
+        label: 'winter.sso::lang.models.provider.scopes'
+        span: right
     client_id:
         label: 'winter.sso::lang.models.provider.client_id'
         span: left
@@ -20,9 +24,6 @@ fields:
         span: right
         attributes:
           autocomplete: "new-password"
-    scopes:
-        label: 'winter.sso::lang.models.provider.scopes'
-        span: left
 
 secondaryTabs:
   fields:

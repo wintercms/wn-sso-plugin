@@ -77,7 +77,7 @@ class Plugin extends PluginBase
             'providers' => [
                 'label'       => 'winter.sso::lang.models.provider.label_plural',
                 'description' => 'winter.sso::lang.models.provider.menu_description',
-                'icon'        => 'icon-key',
+                'icon'        => 'icon-openid',
                 'url'         => Backend::url('winter/sso/providers'),
                 'permissions' => ['winter.sso.view_providers'],
                 'category'    => SettingsManager::CATEGORY_SOCIAL,
