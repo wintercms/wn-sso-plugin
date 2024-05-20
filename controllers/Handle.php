@@ -7,6 +7,7 @@ use BackendAuth;
 use Backend\Classes\Controller;
 use Backend\Models\AccessLog;
 use Config;
+use Event;
 use Exception;
 use Flash;
 use Illuminate\Http\RedirectResponse;
@@ -73,8 +74,8 @@ class Handle extends Controller
         // issues
         try {
             $ssoUser = Socialite::driver($provider)->user();
-            if ($signInResult = $this->fireEvent('winter.sso.signin', [$this, $ssoUser)) {
-                // do something
+            if ($signInResult = $this->fireEvent('winter.sso.signin', [$this, $ssoUser])) {
+                // @TODO: handle event results
             }
         } catch (InvalidStateException $e) {
             Flash::error(trans('winter.sso::lang.messages.invalid_state'));
@@ -95,16 +96,24 @@ class Handle extends Controller
         }
 
         if (!$user) {
-            // $password = Str::random(400);
-            // $user = $this->authManager->register([
-            //     'email' => $ssoUser->getEmail(),
-            //     'password' => $password,
-            //     'password_confirmation' => $password,
-            //     'name' => $ssoUser->getName(),
-            // ]);
-            // $user->setSsoConfig('allow_password_auth', false);
-            // @TODO: Event here for registering user if desired, default fallback abort behaviour
-            abort(403, 'User not found');
+            Event::listen('winter.sso.register', function (self $controller, \Laravel\Socialite\Two\User $user) {
+                // $password = Str::random(400);
+                // $user = $this->authManager->register([
+                //     'email' => $ssoUser->getEmail(),
+                //     'password' => $password,
+                //     'password_confirmation' => $password,
+                //     'name' => $ssoUser->getName(),
+                // ]);
+                // $user->setSsoConfig('allow_password_auth', false);
+                // return $user;
+            });
+            if (Config::get('winter.sso::allow_registration')) {
+                $user = $this->fireEvent('winter.sso.register', [$this, $ssoUser]);
+            }
+            if (!$user) {
+                Flash::error(trans('winter.sso::lang.messages.user_not_found', ['user' => $ssoUser->getEmail()]));
+                return Backend::redirect('backend/auth/signin');
+            }
         }
 
         if (

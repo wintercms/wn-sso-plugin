@@ -11,6 +11,7 @@ return [
     'messages' => [
         'invalid_state' => 'Invalid state: request is not from the SSO Provider',
         'inactive_provider' => 'This Single Sign On Provider is not enabled',
+        'user_not_found' => ':user: user not found',
     ],
     'models' => [
         'general' => [
