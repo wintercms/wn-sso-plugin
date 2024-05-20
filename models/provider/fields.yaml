@@ -7,6 +7,7 @@ fields:
         label: 'winter.sso::lang.models.provider.name'
         type: dropdown
         emptyOption: 'winter.sso::lang.models.provider.empty_option'
+        required: true
         span: left
     scopes:
         label: 'winter.sso::lang.models.provider.scopes'
@@ -14,6 +15,7 @@ fields:
     client_id:
         label: 'winter.sso::lang.models.provider.client_id'
         span: left
+        required: true
         attributes:
           autocomplete: off
     client_secret:

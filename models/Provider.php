@@ -32,7 +32,6 @@ class Provider extends Model
     public $rules = [
         'name' => 'required',
         'client_id' => 'required',
-        'client_secret' => 'required',
     ];
 
     /**

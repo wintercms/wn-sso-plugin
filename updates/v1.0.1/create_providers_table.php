@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->index();
             $table->string('client_id');
-            $table->string('client_secret');
+            $table->string('client_secret')->nullable();
             $table->string('scopes')->nullable();
             $table->timestamps();
         });
