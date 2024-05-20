@@ -59,7 +59,7 @@ class Handle extends Controller
 
     /**
      * Processes a callback from the SSO provider
-     * @throws HttpException if the user cannot be found
+     * Redirect back to signin form on errors with Flash message.
      */
     public function callback(string $provider): RedirectResponse
     {
@@ -134,8 +134,7 @@ class Handle extends Controller
         }
 
         if ($updates) {
-            $user->setSsoValues($provider, $updates);
-            $user->save();
+            $user->setSsoValues($provider, $updates, save:true);
         }
 
         // Check if the user is allowed to keep a persistent session
@@ -182,6 +181,7 @@ class Handle extends Controller
 
     /**
      * Redirects the user to the authentication page of the given provider.
+     * Redirect back to signin form on errors with Flash message.
      */
     public function redirect(string $provider): RedirectResponse
     {
