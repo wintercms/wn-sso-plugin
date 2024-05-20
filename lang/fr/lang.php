@@ -30,8 +30,8 @@ return [
             'provided_email' => 'Email fourni',
         ],
         'provider' => [
-            'label' => 'Provider',
-            'label_plural' => 'Providers',
+            'label' => 'Fournisseur SSO',
+            'label_plural' => 'Fournisseurs SSO',
         ],
     ],
     'provider_btn' => [

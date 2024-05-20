@@ -80,7 +80,7 @@ class Plugin extends PluginBase
                 'icon'        => 'icon-openid',
                 'url'         => Backend::url('winter/sso/providers'),
                 'permissions' => ['winter.sso.view_providers'],
-                'category'    => SettingsManager::CATEGORY_SOCIAL,
+                'category'    => SettingsManager::CATEGORY_SYSTEM,
             ],
         ];
     }
