@@ -99,7 +99,10 @@ class Plugin extends PluginBase
      */
     protected function forceEmailLogin(): void
     {
-        User::$loginAttribute = 'email';
+        // only do this for the sso callback route, still allow username login for regular signin
+        if (str_starts_with(\Request::path(), Backend::baseUrl('/winter/sso/handle/callback/'))) {
+            User::$loginAttribute = 'email';
+        }
         User::extend(function ($model) {
             $model->addDynamicMethod('getSsoValue', function (string $provider, mixed $key) use ($model) {
                 return $model->metadata['winter.sso'][$provider][$key] ?? null;
