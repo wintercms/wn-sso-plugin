@@ -163,22 +163,10 @@ class Plugin extends PluginBase
     {
         // Extend the signin view to add the SSO buttons for the enabled providers
         Event::listen('backend.auth.extendSigninView', function ($controller) {
-            $buttonsHtml = '';
-
-            foreach (Config::get('winter.sso::enabled_providers', []) as $provider) {
-                $providerName = Lang::get("winter.sso::lang.providers.$provider");
-                $buttonsHtml .= View::make("winter.sso::buttons.provider", [
-                    'logoUrl' => Url::asset('/plugins/winter/sso/assets/images/providers/' . $provider . '.svg'),
-                    'logoAlt' => Lang::get('winter.sso::lang.provider_btn.alt_text', ['provider' => $providerName]),
-                    'url' => Backend::url('winter/sso/handle/redirect/' . $provider),
-                    'label' => Lang::get('winter.sso::lang.provider_btn.label', ['provider' => $providerName]),
-                ]);
-            }
-
             $controller->addCss('/plugins/winter/sso/assets/dist/css/sso.css', 'Winter.SSO');
 
-            if (!empty($buttonsHtml)) {
-                echo $buttonsHtml;
+            if ($view = View::make("winter.sso::providers", ['providers' => Config::get('winter.sso::enabled_providers', [])])) {
+                echo $view;
             }
         });
     }
