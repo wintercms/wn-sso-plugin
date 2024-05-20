@@ -10,6 +10,7 @@ use Event;
 use Lang;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
+use Request;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
 use Url;
@@ -100,7 +101,7 @@ class Plugin extends PluginBase
     protected function forceEmailLogin(): void
     {
         // only do this for the sso callback route, still allow username login for regular signin
-        if (str_starts_with(\Request::path(), Backend::baseUrl('/winter/sso/handle/callback/'))) {
+        if (str_contains(Request::path(), '/winter/sso/handle/callback/')) {
             User::$loginAttribute = 'email';
         }
         User::extend(function ($model) {
