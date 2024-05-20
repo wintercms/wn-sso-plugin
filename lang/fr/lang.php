@@ -8,11 +8,15 @@ return [
     'permissions' => [
         'view_logs' => 'Voir les logs',
     ],
+    'messages' => [
+        'invalid_state' => 'État erronée: la requête ne provient pas du fournisseur de connexion unique (SSO)',
+        'inactive_provider' => 'This Single Sign On Provider is not enabled',
+    ],
     'models' => [
         'general' => [
             'id' => 'ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'created_at' => 'Création',
+            'updated_at' => 'Mise à jour',
         ],
         'log' => [
             'label' => 'Log',
