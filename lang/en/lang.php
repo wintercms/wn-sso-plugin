@@ -12,6 +12,7 @@ return [
         'general' => [
             'id' => 'ID',
             'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ],
         'log' => [
             'label' => 'Log',
@@ -23,6 +24,17 @@ return [
             'ip' => 'IP Address',
             'provided_id' => 'Provided ID',
             'provided_email' => 'Provided Email',
+        ],
+        'provider' => [
+            'label' => 'Provider',
+            'label_plural' => 'Providers',
+            'name' => 'Name',
+            'slug' => 'Slug',
+            'client_id' => 'Client ID',
+            'client_secret' => 'Client Secret',
+            'scopes' => 'Extra Scopes',
+            'logo' => 'Logo',
+            'is_enabled' => 'Is Enabled',
         ],
     ],
     'providers' => [

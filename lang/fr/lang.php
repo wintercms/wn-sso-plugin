@@ -11,7 +11,8 @@ return [
     'models' => [
         'general' => [
             'id' => 'ID',
-            'created_at' => 'Créer le',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ],
         'log' => [
             'label' => 'Log',
@@ -23,6 +24,10 @@ return [
             'ip' => 'Adresse IP',
             'provided_id' => 'Identifiant fourni',
             'provided_email' => 'Email fourni',
+        ],
+        'provider' => [
+            'label' => 'Provider',
+            'label_plural' => 'Providers',
         ],
     ],
     'providers' => [

@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: 'winter.sso::lang.models.provider.label'
+
+# Model Form Field configuration
+form: $/winter/sso/models/provider/fields.yaml
+
+# Model Class name
+modelClass: Winter\SSO\Models\Provider
+
+# Default redirect location
+defaultRedirect: winter/sso/providers
+
+# Create page
+create:
+    title: backend::lang.form.create_title
+    redirect: winter/sso/providers/update/:id
+    redirectClose: winter/sso/providers
+
+# Update page
+update:
+    title: backend::lang.form.update_title
+    redirect: winter/sso/providers
+    redirectClose: winter/sso/providers
+
+# Preview page
+preview:
+    title: backend::lang.form.preview_title

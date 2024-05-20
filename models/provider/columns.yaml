@@ -1,0 +1,32 @@
+# ===================================
+#  List Column Definitions
+# ===================================
+
+columns:
+    id:
+        label: 'winter.sso::lang.models.general.id'
+        invisible: true
+    logo:
+      label: 'winter.sso::lang.models.provider.logo'
+      type: image
+      sortable: false
+    slug:
+        label: 'winter.sso::lang.models.provider.slug'
+    name:
+        label: 'winter.sso::lang.models.provider.name'
+    client_id:
+        label: 'winter.sso::lang.models.provider.client_id'
+    scopes:
+        label: 'winter.sso::lang.models.provider.scopes'
+        searchable: true
+    created_at:
+        label: 'winter.sso::lang.models.general.created_at'
+        type: datetime
+        searchable: true
+        sortable: true
+        invisible: true
+    updated_at:
+        label: 'winter.sso::lang.models.general.updated_at'
+        type: datetime
+        searchable: true
+        sortable: true

@@ -52,6 +52,11 @@ class Plugin extends PluginBase
                 'tab' => 'winter.sso::lang.plugin.name',
                 'roles' => [UserRole::CODE_DEVELOPER],
             ],
+            'winter.sso.view_providers' => [
+                'label' => 'winter.sso::lang.permissions.view_providers',
+                'tab' => 'winter.sso::lang.plugin.name',
+                'roles' => [UserRole::CODE_DEVELOPER],
+            ],
         ];
     }
 
@@ -68,6 +73,14 @@ class Plugin extends PluginBase
                 'url'         => Backend::url('winter/sso/logs'),
                 'permissions' => ['winter.sso.view_logs'],
                 'category'    => SettingsManager::CATEGORY_LOGS,
+            ],
+            'providers' => [
+                'label'       => 'winter.sso::lang.models.provider.label_plural',
+                'description' => 'winter.sso::lang.models.provider.menu_description',
+                'icon'        => 'icon-key',
+                'url'         => Backend::url('winter/sso/providers'),
+                'permissions' => ['winter.sso.view_providers'],
+                'category'    => SettingsManager::CATEGORY_SOCIAL,
             ],
         ];
     }

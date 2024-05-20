@@ -1,3 +1,6 @@
-'1.0.0':
+1.0.0:
     - 'First version of Winter.SSO'
     - v1.0.0/create_logs_table.php
+1.0.1:
+    - 'Add Provider model and controller'
+    - v1.0.1/create_providers_table.php
