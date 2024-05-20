@@ -74,7 +74,7 @@ class Handle extends Controller
         // issues
         try {
             $ssoUser = Socialite::driver($provider)->user();
-            if ($signInResult = $this->fireSystemEvent('winter.sso.signin', [$ssoUser])) {
+            if ($signInResult = Event::fire('winter.sso.signin', [$this, $ssoUser])) {
                 // @TODO: handle event results
             }
         } catch (InvalidStateException $e) {
@@ -108,7 +108,7 @@ class Handle extends Controller
                 // return $user;
             });
             if (Config::get('winter.sso::allow_registration')) {
-                $user = $this->fireSystemEvent('winter.sso.register', [$ssoUser]);
+                $user = Event::fire('winter.sso.register', [$this, $ssoUser]);
             }
             if (!$user) {
                 Flash::error(trans('winter.sso::lang.messages.user_not_found', ['user' => $ssoUser->getEmail()]));
