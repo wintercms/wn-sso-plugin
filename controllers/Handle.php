@@ -180,15 +180,15 @@ class Handle extends Controller
     public function redirect(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            abort(404);
+            Flash::error(trans('winter.sso::lang.messages.inactive_provider'));
+            return Backend::redirect('backend/auth/signin');
         }
 
         if ($this->authManager->getUser()) {
             // @TODO:
             // - Handle case of user explicitly attaching a SSO provider to their account
-            // - Localization
-            Flash::error("You are already logged in. Please log out first.");
-            return Redirect::back();
+            Flash::error(trans('winter.sso::lang.messages.already_logged_in'));
+            return Backend::redirect('backend/auth/signin');
         }
         $scopes = Config::get('services.' . $provider . '.scopes', []);
 

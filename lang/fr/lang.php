@@ -11,6 +11,8 @@ return [
     'messages' => [
         'invalid_state' => 'État erronée: la requête ne provient pas du fournisseur de connexion unique (SSO)',
         'inactive_provider' => 'This Single Sign On Provider is not enabled',
+        'user_not_found' => "L'usager :user: n'existe pas.",
+        'already_logged_in' => "Vous êtes déjà connecté. Veuillez d'abord vous déconnecter.",
     ],
     'models' => [
         'general' => [
