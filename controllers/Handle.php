@@ -58,7 +58,8 @@ class Handle extends Controller
     public function callback(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            abort(404);
+            Flash::error(trans('winter.sso::lang.messages.inactive_provider'));
+            return Backend::redirect('backend/auth/signin');
         }
 
         // @TODO: Login or register the user / provide an event for plugins to handle

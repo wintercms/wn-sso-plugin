@@ -10,6 +10,7 @@ return [
     ],
     'messages' => [
         'invalid_state' => 'Invalid state: request is not from the SSO Provider',
+        'inactive_provider' => 'This Single Sign On Provider is not enabled',
     ],
     'models' => [
         'general' => [
