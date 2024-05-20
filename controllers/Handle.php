@@ -15,6 +15,7 @@ use Laravel\Socialite\Two\InvalidStateException;
 use Laravel\Socialite\Two\User as SocialiteUser;
 use Redirect;
 use Request;
+use Session;
 use Socialite;
 use System\Classes\UpdateManager;
 use Winter\SSO\Models\Log;
@@ -68,13 +69,13 @@ class Handle extends Controller
     {
         if (!in_array($provider, $this->enabledProviders)) {
             Flash::error(trans('winter.sso::lang.messages.inactive_provider'));
-            return Backend::redirect('backend/auth/signin');
+            return $this->redirectToSignInPage();
         }
 
         if (!Request::input('code')) {
             $error = sprintf("%s: %s", Request::input('error'), Request::input('error_description'));
             Flash::error($error);
-            return Backend::redirect('backend/auth/signin');
+            return $this->redirectToSignInPage();
         }
 
         // @TODO: Login or register the user / provide an event for plugins to handle
@@ -88,7 +89,10 @@ class Handle extends Controller
             }
         } catch (InvalidStateException $e) {
             Flash::error(trans('winter.sso::lang.messages.invalid_state'));
-            return Backend::redirect('backend/auth/signin');
+            return $this->redirectToSignInPage();
+        } catch (\Exception $e) {
+            Flash::error($e->getMessage());
+            return $this->redirectToSignInPage();
         }
 
         try {
@@ -122,7 +126,7 @@ class Handle extends Controller
             }
             if (!$user) {
                 Flash::error(trans('winter.sso::lang.messages.user_not_found', ['user' => $ssoUser->getEmail()]));
-                return Backend::redirect('backend/auth/signin');
+                return $this->redirectToSignInPage();
             }
         }
 
@@ -190,13 +194,13 @@ class Handle extends Controller
     {
         if (!in_array($provider, $this->enabledProviders)) {
             Flash::error(trans('winter.sso::lang.messages.inactive_provider'));
-            return Backend::redirect('backend/auth/signin');
+            return $this->redirectToSignInPage();
         }
 
         $config = Config::get('services.' . $provider, []);
         if (!isset($config['client_id'])) {
             Flash::error(trans('winter.sso::lang.messages.misconfigured_provider'));
-            return Backend::redirect('backend/auth/signin');
+            return $this->redirectToSignInPage();
         }
 
         if ($this->authManager->getUser()) {
@@ -207,5 +211,11 @@ class Handle extends Controller
         }
 
         return Socialite::driver($provider)->scopes($config['scopes'] ?? [])->redirect();
+    }
+
+    public function redirectToSignInPage()
+    {
+        $signin_url = Session::pull('signin_url', Backend::url('backend/auth/signin'));
+        return Redirect::to($signin_url);
     }
 }

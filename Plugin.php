@@ -7,13 +7,12 @@ use Backend\Models\User;
 use Backend\Models\UserRole;
 use Config;
 use Event;
-use Lang;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
 use Request;
+use Session;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
-use Url;
 use View;
 
 /**
@@ -167,6 +166,8 @@ class Plugin extends PluginBase
             $controller->addCss('/plugins/winter/sso/assets/dist/css/sso.css', 'Winter.SSO');
 
             if ($view = View::make("winter.sso::providers", ['providers' => Config::get('winter.sso::enabled_providers', [])])) {
+                // save signin_url to redirect
+                Session::put('signin_url', Request::url());
                 echo $view;
             }
         });
