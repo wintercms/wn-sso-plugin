@@ -16,10 +16,6 @@ class Provider extends Model
      */
     public $table = 'winter_sso_providers';
 
-    public $implement = ['Winter.Translate.Behaviors.TranslatableModel'];
-
-    public $translatable = ['name'];
-
     /**
      * @var array Guarded fields
      */
@@ -74,4 +70,20 @@ class Provider extends Model
     public $attachOne = [
         'logo' => [\System\Models\File::class, 'delete' => true],
     ];
+
+    public function beforeSave()
+    {
+        $this->slug = str_slug($this->name);
+    }
+
+    public function getNameOptions()
+    {
+        $values = array_values(trans('winter.sso::lang.providers'));
+        return array_combine($values, $values);
+    }
+
+    public function scopeIsEnabled($query)
+    {
+        return $query->where('is_enabled', true);
+    }
 }

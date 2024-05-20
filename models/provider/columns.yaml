@@ -10,10 +10,13 @@ columns:
       label: 'winter.sso::lang.models.provider.logo'
       type: image
       sortable: false
-    slug:
-        label: 'winter.sso::lang.models.provider.slug'
     name:
         label: 'winter.sso::lang.models.provider.name'
+    is_enabled:
+        label: 'winter.sso::lang.models.provider.is_enabled'
+        type: switch
+    slug:
+        label: 'winter.sso::lang.models.provider.slug'
     client_id:
         label: 'winter.sso::lang.models.provider.client_id'
     scopes:

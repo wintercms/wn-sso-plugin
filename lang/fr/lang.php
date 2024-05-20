@@ -30,15 +30,6 @@ return [
             'label_plural' => 'Providers',
         ],
     ],
-    'providers' => [
-        'bitbucket' => 'Bitbucket',
-        'facebook' => 'Facebook',
-        'github' => 'Github',
-        'gitlab' => 'GitLab',
-        'google' => 'Google',
-        'linkedin' => 'LinkedIn',
-        'twitter' => 'Twitter',
-    ],
     'provider_btn' => [
         'label' => 'Connexion avec :provider',
         'alt_text' => ':provider logo',

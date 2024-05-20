@@ -5,14 +5,8 @@
 fields:
     name:
         label: 'winter.sso::lang.models.provider.name'
+        type: dropdown
         span: left
-    slug:
-        label: 'winter.sso::lang.models.provider.slug'
-        span: right
-        placeholder: winter.blog::lang.post.slug_placeholder
-        preset:
-          field: name
-          type: slug
     client_id:
         label: 'winter.sso::lang.models.provider.client_id'
         span: left
