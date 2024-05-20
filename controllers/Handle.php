@@ -3,13 +3,14 @@
 namespace Winter\SSO\Controllers;
 
 use Backend;
+use BackendAuth;
 use Backend\Classes\Controller;
 use Backend\Models\AccessLog;
-use BackendAuth;
 use Config;
 use Exception;
 use Flash;
 use Illuminate\Http\RedirectResponse;
+use Laravel\Socialite\Two\InvalidStateException;
 use Redirect;
 use Request;
 use Socialite;
@@ -64,11 +65,16 @@ class Handle extends Controller
         // user registration themselves. Would like plugin to be able to handle frontend
         // or backend or even both. If event is used follow naming conventions from in progress
         // issues
-        if (Request::input('code')) {
+        if (!Request::input('code')) {
+            $error = sprintf("%s: %s", Request::input('error'), Request::input('error_description'));
+            Flash::error($error);
+            return Backend::redirect('backend/auth/signin');
+        }
+        try {
             $ssoUser = Socialite::driver($provider)->user();
-        } else {
-            // there was an error
-            throw new AuthenticationException(sprintf("%s: %s", Request::input('error'), Request::input('error_description')));
+        } catch (InvalidStateException $e) {
+            Flash::error(trans('winter.sso::lang.messages.invalid_state'));
+            return Backend::redirect('backend/auth/signin');
         }
 
         try {

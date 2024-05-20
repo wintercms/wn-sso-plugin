@@ -8,6 +8,9 @@ return [
     'permissions' => [
         'view_logs' => 'View logs',
     ],
+    'messages' => [
+        'invalid_state' => 'Invalid state: request is not from the SSO Provider',
+    ],
     'models' => [
         'general' => [
             'id' => 'ID',
