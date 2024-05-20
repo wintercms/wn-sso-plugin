@@ -13,6 +13,7 @@ use Flash;
 use Illuminate\Http\RedirectResponse;
 use Laravel\Socialite\Two\InvalidStateException;
 use Laravel\Socialite\Two\User as SocialiteUser;
+use Redirect;
 use Request;
 use Socialite;
 use System\Classes\UpdateManager;
@@ -202,7 +203,7 @@ class Handle extends Controller
             // @TODO:
             // - Handle case of user explicitly attaching a SSO provider to their account
             Flash::error(trans('winter.sso::lang.messages.already_logged_in'));
-            return Backend::redirect('backend/auth/signin');
+            return Backend::redirect('backend');
         }
 
         return Socialite::driver($provider)->scopes($config['scopes'] ?? [])->redirect();
