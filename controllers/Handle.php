@@ -12,6 +12,7 @@ use Exception;
 use Flash;
 use Illuminate\Http\RedirectResponse;
 use Laravel\Socialite\Two\InvalidStateException;
+use Laravel\Socialite\Two\User as SocialiteUser;
 use Redirect;
 use Request;
 use Socialite;
@@ -51,6 +52,11 @@ class Handle extends Controller
         $this->enabledProviders = Config::get('winter.sso::enabled_providers', []);
     }
 
+    public function getAuthManager()
+    {
+        return $this->authManager;
+    }
+
     /**
      * Processes a callback from the SSO provider
      * @throws HttpException if the user cannot be found
@@ -74,7 +80,7 @@ class Handle extends Controller
         // issues
         try {
             $ssoUser = Socialite::driver($provider)->user();
-            if ($signInResult = Event::fire('winter.sso.signin', [$this, $ssoUser])) {
+            if ($signInResult = Event::fire('winter.sso.signin', [$this, $provider, $ssoUser])) {
                 // @TODO: handle event results
             }
         } catch (InvalidStateException $e) {
@@ -96,19 +102,20 @@ class Handle extends Controller
         }
 
         if (!$user) {
-            Event::listen('winter.sso.register', function (self $controller, \Laravel\Socialite\Two\User $user) {
-                // $password = Str::random(400);
-                // $user = $this->authManager->register([
-                //     'email' => $ssoUser->getEmail(),
-                //     'password' => $password,
-                //     'password_confirmation' => $password,
-                //     'name' => $ssoUser->getName(),
-                // ]);
-                // $user->setSsoConfig('allow_password_auth', false);
-                // return $user;
+            Event::listen('winter.sso.register', function ($controller, $provider, $ssoUser) {
+                return;
+                $password = Str::random(400);
+                $user = $controller->getAuthManager()->register([
+                    'email' => $ssoUser->getEmail(),
+                    'password' => $password,
+                    'password_confirmation' => $password,
+                    'name' => $ssoUser->getName(),
+                ]);
+                $user->setSsoValues($provider, ['allow_password_auth' => false]);
+                return $user;
             });
             if (Config::get('winter.sso::allow_registration')) {
-                $user = Event::fire('winter.sso.register', [$this, $ssoUser]);
+                $user = Event::fire('winter.sso.register', [$this, $provider, $ssoUser]);
             }
             if (!$user) {
                 Flash::error(trans('winter.sso::lang.messages.user_not_found', ['user' => $ssoUser->getEmail()]));
@@ -116,19 +123,18 @@ class Handle extends Controller
             }
         }
 
-        if (
-            $ssoUser->getId()
-            && $user->getSsoId($provider) !== $ssoUser->getId()
-        ) {
+        $updates = [];
+        if ($ssoUser->getId() && $user->getSsoValue($provider, 'id') !== $ssoUser->getId()) {
             // @TODO: Check if request / user is allowed to associate this account to this provider's ID
-            $user->setSsoId($provider, $ssoUser->getId());
-            $user->save();
+            $updates['id'] = $ssoUser->getId();
         }
-        if (
-            $ssoUser->token
-            && $user->getSsoToken($provider) !== $ssoUser->token
-        ) {
-            $user->setSsoToken($provider, $ssoUser->token);
+
+        if ($ssoUser->token && $user->getSsoValue($provider, 'token') !== $ssoUser->token) {
+            $updates['token'] = $ssoUser->token;
+        }
+
+        if ($updates) {
+            $user->setSsoValues($provider, $updates);
             $user->save();
         }
 

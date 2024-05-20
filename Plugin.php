@@ -101,21 +101,18 @@ class Plugin extends PluginBase
     {
         User::$loginAttribute = 'email';
         User::extend(function ($model) {
-            $model->addDynamicMethod('getSsoId', function (string $provider) use ($model) {
-                return $model->metadata['winter.sso'][$provider]['id'] ?? null;
+            $model->addDynamicMethod('getSsoValue', function (string $provider, mixed $key) use ($model) {
+                return $model->metadata['winter.sso'][$provider][$key] ?? null;
             });
-            $model->addDynamicMethod('setSsoId', function (string $provider, string $id) use ($model) {
+            $model->addDynamicMethod('setSsoValues', function (string $provider, array $values, bool $save = false) use ($model) {
                 $metadata = $model->metadata ?? [];
-                $metadata['winter.sso'][$provider]['id'] = $id;
+                foreach ($values as $key => $value) {
+                    $metadata['winter.sso'][$provider][$key] = $value;
+                }
                 $model->metadata = $metadata;
-            });
-            $model->addDynamicMethod('getSsoToken', function (string $provider) use ($model) {
-                return $model->metadata['winter.sso'][$provider]['token'] ?? null;
-            });
-            $model->addDynamicMethod('setSsoToken', function (string $provider, string $token) use ($model) {
-                $metadata = $model->metadata ?? [];
-                $metadata['winter.sso'][$provider]['token'] = $token;
-                $model->metadata = $metadata;
+                if ($save) {
+                    $model->save();
+                }
             });
         });
     }
