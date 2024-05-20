@@ -52,7 +52,6 @@ class Handle extends Controller
 
     /**
      * Processes a callback from the SSO provider
-     * @throws HttpException if the provider is not enabled
      * @throws HttpException if the user cannot be found
      */
     public function callback(string $provider): RedirectResponse
@@ -62,17 +61,21 @@ class Handle extends Controller
             return Backend::redirect('backend/auth/signin');
         }
 
-        // @TODO: Login or register the user / provide an event for plugins to handle
-        // user registration themselves. Would like plugin to be able to handle frontend
-        // or backend or even both. If event is used follow naming conventions from in progress
-        // issues
         if (!Request::input('code')) {
             $error = sprintf("%s: %s", Request::input('error'), Request::input('error_description'));
             Flash::error($error);
             return Backend::redirect('backend/auth/signin');
         }
+
+        // @TODO: Login or register the user / provide an event for plugins to handle
+        // user registration themselves. Would like plugin to be able to handle frontend
+        // or backend or even both. If event is used follow naming conventions from in progress
+        // issues
         try {
             $ssoUser = Socialite::driver($provider)->user();
+            if ($signInResult = $this->fireEvent('winter.sso.signin', [$this, $ssoUser)) {
+                // do something
+            }
         } catch (InvalidStateException $e) {
             Flash::error(trans('winter.sso::lang.messages.invalid_state'));
             return Backend::redirect('backend/auth/signin');
