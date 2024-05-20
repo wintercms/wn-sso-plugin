@@ -192,14 +192,19 @@ class Handle extends Controller
             return Backend::redirect('backend/auth/signin');
         }
 
+        $config = Config::get('services.' . $provider, []);
+        if (!isset($config['client_id'])) {
+            Flash::error(trans('winter.sso::lang.messages.misconfigured_provider'));
+            return Backend::redirect('backend/auth/signin');
+        }
+
         if ($this->authManager->getUser()) {
             // @TODO:
             // - Handle case of user explicitly attaching a SSO provider to their account
             Flash::error(trans('winter.sso::lang.messages.already_logged_in'));
             return Backend::redirect('backend/auth/signin');
         }
-        $scopes = Config::get('services.' . $provider . '.scopes', []);
 
-        return Socialite::driver($provider)->scopes($scopes)->redirect();
+        return Socialite::driver($provider)->scopes($config['scopes'] ?? [])->redirect();
     }
 }

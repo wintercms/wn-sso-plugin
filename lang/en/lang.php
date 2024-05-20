@@ -9,10 +9,11 @@ return [
         'view_logs' => 'View logs',
     ],
     'messages' => [
+        'already_logged_in' => 'You are already logged in. Please log out first.',
         'invalid_state' => 'Invalid state: request is not from the SSO Provider.',
         'inactive_provider' => 'This Single Sign On Provider is not enabled.',
+        'misconfigured_provider' => 'This Single Sign On Provider is not properly configured.',
         'user_not_found' => ':user: user not found.',
-        'already_logged_in' => 'You are already logged in. Please log out first.',
     ],
     'models' => [
         'general' => [
