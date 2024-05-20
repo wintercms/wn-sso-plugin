@@ -13,7 +13,6 @@ use Flash;
 use Illuminate\Http\RedirectResponse;
 use Laravel\Socialite\Two\InvalidStateException;
 use Laravel\Socialite\Two\User as SocialiteUser;
-use Redirect;
 use Request;
 use Socialite;
 use System\Classes\UpdateManager;
@@ -52,7 +51,10 @@ class Handle extends Controller
         $this->enabledProviders = Config::get('winter.sso::enabled_providers', []);
     }
 
-    public function getAuthManager()
+    /**
+     * Returns the $authManager property.
+     */
+    public function getAuthManager() : AuthManager
     {
         return $this->authManager;
     }
