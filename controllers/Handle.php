@@ -72,21 +72,27 @@ class Handle extends Controller
             if (!in_array($provider, $this->enabledProviders)) {
                 throw new Exception(Lang::get('winter.sso::lang.messages.inactive_provider', ['provider' => $provider]));
             }
-
             if (!Request::input('code')) {
                 throw new Exception(sprintf("%s: %s", Request::input('error'), Request::input('error_description')));
             }
-
-            #if ($this->authManager->beforeSignin($this, $provider) === false) {
-            if (Event::fire('backend.user.sso.beforeSignin', [$this, $provider], halt: true) === false) {
+            if (method_exists($this->authManager, 'beforeSignin')) {
+                $result = $this->authManager->beforeSignin($this, $provider);
+            } else {
+                $result = Event::fire('backend.user.sso.beforeSignin', [$this, $provider], halt: true);
+            }
+            if ($result === false) {
                 throw new AuthenticationException(
                     Lang::get('winter.sso::lang.messages.signin_aborted', ['provider' => $provider])
                 );
             }
-            $ssoUser = Socialite::driver($provider)->user();
-            #$this->authManager->afterSignin($this, $provider, $ssoUser);
-            Event::fire('backend.user.sso.signin', [$this, $provider, $ssoUser]);
 
+            $ssoUser = Socialite::driver($provider)->user();
+
+            if (method_exists($this->authManager, 'afterSignin')) {
+                $this->authManager->afterSignin($this, $provider, $ssoUser);
+            } else {
+                Event::fire('backend.user.sso.signin', [$this, $provider, $ssoUser]);
+            }
         } catch (InvalidStateException $e) {
             Flash::error(Lang::get('winter.sso::lang.messages.invalid_state'));
             return $this->redirectToSignInPage();
@@ -107,13 +113,16 @@ class Handle extends Controller
         } catch (AuthenticationException $e) {
             try {
                 if (Config::get('winter.sso::allow_registration')) {
-                    #if ($this->authManager->beforeRegister() === false) {
-                    if (Event::fire('backend.user.beforeRegister', halt: true) === false) {
+                    if (method_exists($this->authManager, 'beforeRegister')) {
+                        $result = $this->authManager->beforeRegister();
+                    } else {
+                        $result = Event::fire('backend.user.beforeRegister', halt: true);
+                    }
+                    if ($result === false) {
                         throw new AuthenticationException(
                             Lang::get('winter.sso::lang.messages.register_aborted')
                         ); 
                     }
-
                     throw new Exception("bypassed until it's ready");
 
                     $password = Str::random(400);
@@ -126,8 +135,11 @@ class Handle extends Controller
                     $user->setSsoValues($provider, ['allow_password_auth' => false]);
                     $user->save();
 
-                    #$this->authManager->afterRegister($user);
-                    Event::fire('backend.user.register', [$user]);
+                    if (method_exists($this->authManager, 'afterRegister')) {
+                        $this->authManager->afterRegister($user);
+                    } else {
+                        Event::fire('backend.user.register', [$user]);
+                    }
                 } else {
                     $email = $ssoUser->getEmail();
                     throw new AuthenticationException(
