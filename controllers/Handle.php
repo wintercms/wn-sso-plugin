@@ -69,7 +69,7 @@ class Handle extends Controller
     public function callback(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            Flash::error(Lang::get('winter.sso::lang.messages.inactive_provider'));
+            Flash::error(Lang::get('winter.sso::lang.messages.inactive_provider', ['provider' => $provider]));
             return $this->redirectToSignInPage();
         }
 
@@ -194,13 +194,13 @@ class Handle extends Controller
     public function redirect(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            Flash::error(Lang::get('winter.sso::lang.messages.inactive_provider'));
+            Flash::error(Lang::get('winter.sso::lang.messages.inactive_provider', ['provider' => $provider]));
             return $this->redirectToSignInPage();
         }
 
         $config = Config::get('services.' . $provider, []);
         if (!isset($config['client_id'])) {
-            Flash::error(Lang::get('winter.sso::lang.messages.misconfigured_provider'));
+            Flash::error(Lang::get('winter.sso::lang.messages.misconfigured_provider', ['provider' => $provider]));
             return $this->redirectToSignInPage();
         }
 
