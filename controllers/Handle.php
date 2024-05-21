@@ -123,7 +123,7 @@ class Handle extends Controller
                 return $user;
             });
             if (Config::get('winter.sso::allow_registration')) {
-                $user = Event::fire('winter.sso.register', [$this, $provider, $ssoUser]);
+                $user = Event::fire('winter.sso.register', [$this, $provider, $ssoUser], halt:true);
             }
             if (!$user) {
                 Flash::error(Lang::get('winter.sso::lang.messages.user_not_found', ['user' => $ssoUser->getEmail()]));
