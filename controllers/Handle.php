@@ -84,7 +84,11 @@ class Handle extends Controller
         // or backend or even both. If event is used follow naming conventions from in progress
         // issues
         try {
-            $this->authManager->beforeSignin($this, $provider);
+            if ($this->authManager->beforeSignin($this, $provider) === false) {
+                throw new AuthenticationException(
+                    Lang::get('winter.sso::lang.messages.signin_aborted', ['provider' => $provider])
+                );
+            }
             $ssoUser = Socialite::driver($provider)->user();
             $this->authManager->afterSignin($this, $provider, $ssoUser);
         } catch (InvalidStateException $e) {

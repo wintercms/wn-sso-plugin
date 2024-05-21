@@ -13,6 +13,7 @@ return [
         'invalid_state' => 'Invalid state: request is not from the SSO Provider.',
         'inactive_provider' => 'The :provider: SSO Provider is not enabled.',
         'misconfigured_provider' => 'The :provider: SSO Provider is not properly configured.',
+        'signin_aborted' => 'Sign-in has been aborted by an event handler for the :provider SSO Provider.',
         'user_not_found' => ':user: user not found.',
     ],
     'models' => [
