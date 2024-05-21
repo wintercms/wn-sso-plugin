@@ -87,7 +87,9 @@ class Handle extends Controller
                 );
             }
             $ssoUser = Socialite::driver($provider)->user();
-            $this->authManager->afterSignin($this, $provider, $ssoUser);
+            #$this->authManager->afterSignin($this, $provider, $ssoUser);
+            Event::fire('backend.user.sso.signin', [$this, $provider, $ssoUser]);
+
         } catch (InvalidStateException $e) {
             Flash::error(Lang::get('winter.sso::lang.messages.invalid_state'));
             return $this->redirectToSignInPage();
