@@ -68,18 +68,15 @@ class Handle extends Controller
      */
     public function callback(string $provider): RedirectResponse
     {
-        if (!in_array($provider, $this->enabledProviders)) {
-            Flash::error(Lang::get('winter.sso::lang.messages.inactive_provider', ['provider' => $provider]));
-            return $this->redirectToSignInPage();
-        }
-
-        if (!Request::input('code')) {
-            $error = sprintf("%s: %s", Request::input('error'), Request::input('error_description'));
-            Flash::error($error);
-            return $this->redirectToSignInPage();
-        }
-
         try {
+            if (!in_array($provider, $this->enabledProviders)) {
+                throw new Exception(Lang::get('winter.sso::lang.messages.inactive_provider', ['provider' => $provider]));
+            }
+
+            if (!Request::input('code')) {
+                throw new Exception(sprintf("%s: %s", Request::input('error'), Request::input('error_description')));
+            }
+
             #if ($this->authManager->beforeSignin($this, $provider) === false) {
             if (Event::fire('backend.user.sso.beforeSignin', [$this, $provider], halt: true) === false) {
                 throw new AuthenticationException(
