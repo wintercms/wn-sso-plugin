@@ -121,6 +121,7 @@ class Handle extends Controller
                     'name' => $ssoUser->getName(),
                 ]);
                 $user->setSsoValues($provider, ['allow_password_auth' => false]);
+                $user->save();
 
                 $this->authManager->afterRegister($user);
             } else {
