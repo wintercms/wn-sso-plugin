@@ -11,8 +11,8 @@ return [
     'messages' => [
         'already_logged_in' => 'You are already logged in. Please log out first.',
         'invalid_state' => 'Invalid state: request is not from the SSO Provider.',
-        'inactive_provider' => 'This Single Sign On Provider is not enabled.',
-        'misconfigured_provider' => 'This Single Sign On Provider is not properly configured.',
+        'inactive_provider' => 'The :provider: SSO Provider is not enabled.',
+        'misconfigured_provider' => 'The :provider: SSO Provider is not properly configured.',
         'user_not_found' => ':user: user not found.',
     ],
     'models' => [
@@ -39,7 +39,7 @@ return [
             'client_id' => 'Client ID',
             'client_secret' => 'Client Secret',
             'empty_option' => '-- Select Provider --',
-            'is_enabled' => 'Is Enabled',
+            'is_enabled' => 'Enabled',
             'menu_description' => 'Configure Single Sign On Providers',
             'name' => 'Name',
             'scopes' => 'Extra Scopes',
