@@ -79,12 +79,9 @@ class Handle extends Controller
             return $this->redirectToSignInPage();
         }
 
-        // @TODO: Login or register the user / provide an event for plugins to handle
-        // user registration themselves. Would like plugin to be able to handle frontend
-        // or backend or even both. If event is used follow naming conventions from in progress
-        // issues
         try {
-            if ($this->authManager->beforeSignin($this, $provider) === false) {
+            #if ($this->authManager->beforeSignin($this, $provider) === false) {
+            if (Event::fire('backend.user.sso.beforeSignin', [$this, $provider], halt: true) === false) {
                 throw new AuthenticationException(
                     Lang::get('winter.sso::lang.messages.signin_aborted', ['provider' => $provider])
                 );
@@ -109,27 +106,34 @@ class Handle extends Controller
             // - Need metadata on users to store that information
             $user = $this->authManager->findUserByCredentials(['email' => $ssoUser->getEmail()]);
         } catch (AuthenticationException $e) {
-            $user = null;
-        }
+            try {
+                if (Config::get('winter.sso::allow_registration')) {
+                    #if ($this->authManager->beforeRegister() === false) {
+                    if (true || Event::fire('backend.user.beforeRegister', halt: true) === false) {
+                        throw new AuthenticationException(
+                            Lang::get('winter.sso::lang.messages.register_aborted')
+                        ); 
+                    }
 
-        if (!$user) {
-            if (false || Config::get('winter.sso::allow_registration')) {
-                // currently disabled
-                $this->authManager->beforeRegister();
+                    $password = Str::random(400);
+                    $user = $this->authManager()->register([
+                        'email' => $ssoUser->getEmail(),
+                        'password' => $password,
+                        'password_confirmation' => $password,
+                        'name' => $ssoUser->getName(),
+                    ]);
+                    $user->setSsoValues($provider, ['allow_password_auth' => false]);
+                    $user->save();
 
-                $password = Str::random(400);
-                $user = $this->authManager()->register([
-                    'email' => $ssoUser->getEmail(),
-                    'password' => $password,
-                    'password_confirmation' => $password,
-                    'name' => $ssoUser->getName(),
-                ]);
-                $user->setSsoValues($provider, ['allow_password_auth' => false]);
-                $user->save();
-
-                $this->authManager->afterRegister($user);
-            } else {
-                Flash::error(Lang::get('winter.sso::lang.messages.user_not_found', ['user' => $ssoUser->getEmail()]));
+                    $this->authManager->afterRegister($user);
+                } else {
+                    $email = $ssoUser->getEmail();
+                    throw new AuthenticationException(
+                        Lang::get('winter.sso::lang.messages.user_not_found', ['user' => $email])
+                    );
+                }
+            } catch (Exception $e) {
+                Flash::error($e->getMessage());
                 return $this->redirectToSignInPage();
             }
         }
