@@ -109,11 +109,13 @@ class Handle extends Controller
             try {
                 if (Config::get('winter.sso::allow_registration')) {
                     #if ($this->authManager->beforeRegister() === false) {
-                    if (true || Event::fire('backend.user.beforeRegister', halt: true) === false) {
+                    if (Event::fire('backend.user.beforeRegister', halt: true) === false) {
                         throw new AuthenticationException(
                             Lang::get('winter.sso::lang.messages.register_aborted')
                         ); 
                     }
+
+                    throw new Exception("bypassed until it's ready");
 
                     $password = Str::random(400);
                     $user = $this->authManager()->register([
@@ -125,7 +127,8 @@ class Handle extends Controller
                     $user->setSsoValues($provider, ['allow_password_auth' => false]);
                     $user->save();
 
-                    $this->authManager->afterRegister($user);
+                    #$this->authManager->afterRegister($user);
+                    Event::fire('backend.user.register', [$user]);
                 } else {
                     $email = $ssoUser->getEmail();
                     throw new AuthenticationException(
