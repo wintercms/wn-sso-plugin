@@ -2,6 +2,7 @@
 
 namespace Winter\SSO\Models;
 
+use Lang;
 use Model;
 
 /**
@@ -76,7 +77,7 @@ class Provider extends Model
 
     public function getNameOptions()
     {
-        $values = array_values(trans('winter.sso::lang.providers'));
+        $values = array_values(Lang::get('winter.sso::lang.providers'));
         return array_combine($values, $values);
     }
 

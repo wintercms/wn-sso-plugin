@@ -11,6 +11,7 @@ use Event;
 use Exception;
 use Flash;
 use Illuminate\Http\RedirectResponse;
+use Lang;
 use Laravel\Socialite\Two\InvalidStateException;
 use Laravel\Socialite\Two\User as SocialiteUser;
 use Redirect;
@@ -68,7 +69,7 @@ class Handle extends Controller
     public function callback(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            Flash::error(trans('winter.sso::lang.messages.inactive_provider'));
+            Flash::error(Lang::get('winter.sso::lang.messages.inactive_provider'));
             return $this->redirectToSignInPage();
         }
 
@@ -88,7 +89,7 @@ class Handle extends Controller
                 // @TODO: handle event results
             }
         } catch (InvalidStateException $e) {
-            Flash::error(trans('winter.sso::lang.messages.invalid_state'));
+            Flash::error(Lang::get('winter.sso::lang.messages.invalid_state'));
             return $this->redirectToSignInPage();
         } catch (\Exception $e) {
             Flash::error($e->getMessage());
@@ -125,7 +126,7 @@ class Handle extends Controller
                 $user = Event::fire('winter.sso.register', [$this, $provider, $ssoUser]);
             }
             if (!$user) {
-                Flash::error(trans('winter.sso::lang.messages.user_not_found', ['user' => $ssoUser->getEmail()]));
+                Flash::error(Lang::get('winter.sso::lang.messages.user_not_found', ['user' => $ssoUser->getEmail()]));
                 return $this->redirectToSignInPage();
             }
         }
@@ -193,20 +194,20 @@ class Handle extends Controller
     public function redirect(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            Flash::error(trans('winter.sso::lang.messages.inactive_provider'));
+            Flash::error(Lang::get('winter.sso::lang.messages.inactive_provider'));
             return $this->redirectToSignInPage();
         }
 
         $config = Config::get('services.' . $provider, []);
         if (!isset($config['client_id'])) {
-            Flash::error(trans('winter.sso::lang.messages.misconfigured_provider'));
+            Flash::error(Lang::get('winter.sso::lang.messages.misconfigured_provider'));
             return $this->redirectToSignInPage();
         }
 
         if ($this->authManager->getUser()) {
             // @TODO:
             // - Handle case of user explicitly attaching a SSO provider to their account
-            Flash::error(trans('winter.sso::lang.messages.already_logged_in'));
+            Flash::error(Lang::get('winter.sso::lang.messages.already_logged_in'));
             return Backend::redirect('backend');
         }
 
