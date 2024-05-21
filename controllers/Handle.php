@@ -84,10 +84,9 @@ class Handle extends Controller
         // or backend or even both. If event is used follow naming conventions from in progress
         // issues
         try {
+            $this->authManager->beforeSignin($this, $provider);
             $ssoUser = Socialite::driver($provider)->user();
-            if ($signInResult = Event::fire('winter.sso.signin', [$this, $provider, $ssoUser])) {
-                // @TODO: handle event results
-            }
+            $this->authManager->afterSignin($this, $provider, $ssoUser);
         } catch (InvalidStateException $e) {
             Flash::error(Lang::get('winter.sso::lang.messages.invalid_state'));
             return $this->redirectToSignInPage();
@@ -110,22 +109,21 @@ class Handle extends Controller
         }
 
         if (!$user) {
-            Event::listen('winter.sso.register', function ($controller, $provider, $ssoUser) {
-                return;
+            if (false || Config::get('winter.sso::allow_registration')) {
+                // currently disabled
+                $this->authManager->beforeRegister();
+
                 $password = Str::random(400);
-                $user = $controller->getAuthManager()->register([
+                $user = $this->authManager()->register([
                     'email' => $ssoUser->getEmail(),
                     'password' => $password,
                     'password_confirmation' => $password,
                     'name' => $ssoUser->getName(),
                 ]);
                 $user->setSsoValues($provider, ['allow_password_auth' => false]);
-                return $user;
-            });
-            if (Config::get('winter.sso::allow_registration')) {
-                $user = Event::fire('winter.sso.register', [$this, $provider, $ssoUser], halt:true);
-            }
-            if (!$user) {
+
+                $this->authManager->afterRegister($user);
+            } else {
                 Flash::error(Lang::get('winter.sso::lang.messages.user_not_found', ['user' => $ssoUser->getEmail()]));
                 return $this->redirectToSignInPage();
             }
