@@ -81,7 +81,7 @@ class Handle extends Controller
                 $result = Event::fire('backend.user.sso.beforeSignin', [$this, $provider], halt: true);
             }
             if ($result === false) {
-                throw new AuthenticationException(
+                throw new Exception(
                     Lang::get('winter.sso::lang.messages.signin_aborted', ['provider' => $provider])
                 );
             }
@@ -93,11 +93,12 @@ class Handle extends Controller
             } else {
                 Event::fire('backend.user.sso.signin', [$this, $provider, $ssoUser]);
             }
-        } catch (InvalidStateException $e) {
-            Flash::error(Lang::get('winter.sso::lang.messages.invalid_state'));
-            return $this->redirectToSignInPage();
-        } catch (\Exception $e) {
-            Flash::error($e->getMessage());
+        } catch (Exception $e) {
+            if ($e instanceof InvalidStateException) {
+                Flash::error(Lang::get('winter.sso::lang.messages.invalid_state'));
+            } else {
+                Flash::error($e->getMessage());
+            }
             return $this->redirectToSignInPage();
         }
 
@@ -119,7 +120,7 @@ class Handle extends Controller
                         $result = Event::fire('backend.user.beforeRegister', halt: true);
                     }
                     if ($result === false) {
-                        throw new AuthenticationException(
+                        throw new Exception(
                             Lang::get('winter.sso::lang.messages.register_aborted')
                         ); 
                     }
