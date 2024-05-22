@@ -8,10 +8,22 @@ return [
     'permissions' => [
         'view_logs' => 'View logs',
     ],
+    'messages' => [
+        'already_logged_in' => 'You are already logged in. Please log out first.',
+        'connection_not_allowed' => ":email: connection not allowed for :provider SSO Provider.",
+        'invalid_ssoid' => ':email: Id mismatch for :provider SSO Provider.',
+        'invalid_state' => 'Invalid state: request is not from :provider SSO Provider.',
+        'inactive_provider' => 'The :provider: SSO Provider is not enabled.',
+        'misconfigured_provider' => 'The :provider: SSO Provider is not properly configured.',
+        'register_aborted' => 'New user registration has been aborted by an event handler.',
+        'signin_aborted' => 'Sign-in has been aborted by an event handler for the :provider SSO Provider.',
+        'user_not_found' => ':user: user not found.',
+    ],
     'models' => [
         'general' => [
             'id' => 'ID',
             'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ],
         'log' => [
             'label' => 'Log',
@@ -24,6 +36,19 @@ return [
             'provided_id' => 'Provided ID',
             'provided_email' => 'Provided Email',
         ],
+        'provider' => [
+            'label' => 'SSO Provider',
+            'label_plural' => 'SSO Providers',
+            'logo' => 'Logo',
+            'client_id' => 'Client ID',
+            'client_secret' => 'Client Secret',
+            'empty_option' => '-- Select Provider --',
+            'is_enabled' => 'Enabled',
+            'menu_description' => 'Configure Single Sign On Providers',
+            'name' => 'Name',
+            'scopes' => 'Extra Scopes',
+            'slug' => 'Slug',
+        ],
     ],
     'providers' => [
         'bitbucket' => 'Bitbucket',
@@ -32,6 +57,7 @@ return [
         'gitlab' => 'GitLab',
         'google' => 'Google',
         'linkedin' => 'LinkedIn',
+        'linkedin-openid' => 'LinkedIn (OpenID)',
         'twitter' => 'Twitter',
     ],
     'provider_btn' => [

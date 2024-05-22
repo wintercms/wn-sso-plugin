@@ -1,0 +1,43 @@
+# ===================================
+#  Form Field Definitions
+# ===================================
+
+fields:
+    name:
+        label: 'winter.sso::lang.models.provider.name'
+        type: dropdown
+        emptyOption: 'winter.sso::lang.models.provider.empty_option'
+        required: true
+        span: left
+    scopes:
+        label: 'winter.sso::lang.models.provider.scopes'
+        span: right
+    client_id:
+        label: 'winter.sso::lang.models.provider.client_id'
+        span: left
+        required: true
+        attributes:
+          autocomplete: off
+    client_secret:
+        label: 'winter.sso::lang.models.provider.client_secret'
+        type: sensitive
+        allowCopy: false
+        hideOnTabChange: true
+        span: right
+        attributes:
+          autocomplete: "new-password"
+
+secondaryTabs:
+  fields:
+    is_enabled:
+        label: 'winter.sso::lang.models.provider.is_enabled'
+        type: switch
+        default: false
+        span: full
+    logo:
+        label: 'winter.sso::lang.models.provider.logo'
+        type: fileupload
+        mode: image
+        imageWidth: 100px;
+        imageHeight: 100px;
+        span: auto

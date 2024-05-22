@@ -20,6 +20,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Require Explicit Permission
+    |--------------------------------------------------------------------------
+    |
+    | If true, user must allow connection from specific SSO provider.
+    |
+    */
+
+    'require_explicit_permission' => env('SSO_REQUIRE_EXPLICIT_PERMISSION', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Enabled Providers
     |--------------------------------------------------------------------------
     |
@@ -33,7 +44,7 @@ return [
         // 'github',
         // 'gitlab',
         // 'google',
-        // 'linkedin',
+        // 'linkedin-openid',
         // 'twitter',
         // 'twitter-oauth-2',
     ],
@@ -112,9 +123,9 @@ return [
             'guzzle' => [],
         ],
 
-        'linkedin' => [
-            'client_id' => env('LINKEDIN_CLIENT_ID'),
-            'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+        'linkedin-openid' => [
+            'client_id' => env('LINKEDIN_OPENID_CLIENT_ID'),
+            'client_secret' => env('LINKEDIN_OPENID_CLIENT_SECRET'),
             'guzzle' => [],
         ],
 

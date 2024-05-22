@@ -7,12 +7,12 @@ use Backend\Models\User;
 use Backend\Models\UserRole;
 use Config;
 use Event;
-use Lang;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
+use Request;
+use Session;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
-use Url;
 use View;
 
 /**
@@ -52,6 +52,11 @@ class Plugin extends PluginBase
                 'tab' => 'winter.sso::lang.plugin.name',
                 'roles' => [UserRole::CODE_DEVELOPER],
             ],
+            'winter.sso.view_providers' => [
+                'label' => 'winter.sso::lang.permissions.view_providers',
+                'tab' => 'winter.sso::lang.plugin.name',
+                'roles' => [UserRole::CODE_DEVELOPER],
+            ],
         ];
     }
 
@@ -68,6 +73,14 @@ class Plugin extends PluginBase
                 'url'         => Backend::url('winter/sso/logs'),
                 'permissions' => ['winter.sso.view_logs'],
                 'category'    => SettingsManager::CATEGORY_LOGS,
+            ],
+            'providers' => [
+                'label'       => 'winter.sso::lang.models.provider.label_plural',
+                'description' => 'winter.sso::lang.models.provider.menu_description',
+                'icon'        => 'icon-openid',
+                'url'         => Backend::url('winter/sso/providers'),
+                'permissions' => ['winter.sso.view_providers'],
+                'category'    => SettingsManager::CATEGORY_SYSTEM,
             ],
         ];
     }
@@ -86,15 +99,23 @@ class Plugin extends PluginBase
      */
     protected function forceEmailLogin(): void
     {
-        User::$loginAttribute = 'email';
+        // only do this for the sso callback route, still allow username login for regular signin
+        if (str_starts_with(Request::url(), Backend::url('winter/sso/handle/callback/'))) {
+            User::$loginAttribute = 'email';
+        }
         User::extend(function ($model) {
-            $model->addDynamicMethod('getSsoId', function (string $provider) use ($model) {
-                return $model->metadata['winter.sso'][$provider]['id'] ?? null;
+            $model->addDynamicMethod('getSsoValue', function (string $provider, mixed $key, $default = null) use ($model) {
+                return $model->metadata['winter.sso'][$provider][$key] ?? $default;
             });
-            $model->addDynamicMethod('setSsoId', function (string $provider, string $id) use ($model) {
+            $model->addDynamicMethod('setSsoValues', function (string $provider, array $values, bool $save = false) use ($model) {
                 $metadata = $model->metadata ?? [];
-                $metadata['winter.sso'][$provider]['id'] = $id;
+                foreach ($values as $key => $value) {
+                    $metadata['winter.sso'][$provider][$key] = $value;
+                }
                 $model->metadata = $metadata;
+                if ($save) {
+                    $model->save();
+                }
             });
         });
     }
@@ -142,22 +163,12 @@ class Plugin extends PluginBase
     {
         // Extend the signin view to add the SSO buttons for the enabled providers
         Event::listen('backend.auth.extendSigninView', function ($controller) {
-            $buttonsHtml = '';
-
-            foreach (Config::get('winter.sso::enabled_providers', []) as $provider) {
-                $providerName = Lang::get("winter.sso::lang.providers.$provider");
-                $buttonsHtml .= View::make("winter.sso::buttons.provider", [
-                    'logoUrl' => Url::asset('/plugins/winter/sso/assets/images/providers/' . $provider . '.svg'),
-                    'logoAlt' => Lang::get('winter.sso::lang.provider_btn.alt_text', ['provider' => $providerName]),
-                    'url' => Backend::url('winter/sso/handle/redirect/' . $provider),
-                    'label' => Lang::get('winter.sso::lang.provider_btn.label', ['provider' => $providerName]),
-                ]);
-            }
-
             $controller->addCss('/plugins/winter/sso/assets/dist/css/sso.css', 'Winter.SSO');
 
-            if (!empty($buttonsHtml)) {
-                echo $buttonsHtml;
+            if ($view = View::make("winter.sso::providers", ['providers' => Config::get('winter.sso::enabled_providers', [])])) {
+                // save signin_url to redirect
+                Session::put('signin_url', Request::url());
+                echo $view;
             }
         });
     }

@@ -6,3 +6,35 @@ fields:
     id:
         label: 'winter.sso::lang.models.general.id'
         disabled: true
+        hidden: true
+
+    provider:
+        label: winter.sso::lang.models.log.provider
+        type: text
+        span: auto
+
+    action:
+        label: winter.sso::lang.models.log.action
+        type: text
+        span: auto
+
+    ip:
+        label: winter.sso::lang.models.log.ip
+        type: text
+        span: auto
+
+    provided_id:
+        label: winter.sso::lang.models.log.provided_id
+        type: text
+        span: auto
+
+    provided_email:
+        label: winter.sso::lang.models.log.provided_email
+        type: text
+        span: auto
+
+    created_at:
+        label: 'winter.sso::lang.models.general.created_at'
+        type: datepicker
+        hidden: true
+
