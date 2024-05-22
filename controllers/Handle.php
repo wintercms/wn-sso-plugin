@@ -124,7 +124,8 @@ class Handle extends Controller
             // - need to know if the user has already connected via SSO and if so what is the ID
             // for the current service because that MUST match the returned result here.
             // - Need metadata on users to store that information
-            $user = $this->authManager->findUserByCredentials(['email' => $ssoUser->getEmail()]);
+            $normalizedEmail = $this->normalizeEmail($ssoUser->getEmail());
+            $user = $this->authManager->findUserByCredentials(['email' => $normalizedEmail]);
         } catch (AuthenticationException $e) {
             try {
                 if (Config::get('winter.sso::allow_registration')) {
@@ -237,5 +238,24 @@ class Handle extends Controller
     {
         $signin_url = Session::pull('signin_url', Backend::url('backend/auth/signin'));
         return Redirect::to($signin_url);
+    }
+
+    /*
+     * Returns canonical form for google emails.
+     * Remove +specifier after any email username
+     */
+    public function normalizeEmail($email)
+    {
+        [$user, $domain] = explode('@', $email);
+
+        if (in_array($domain, ['gmail.com', 'googlemail.com'])) {
+            // Google emails can have "." anywhere in the username but the actual account has none.
+            $user = str_replace('.', '', $user);
+        }
+        // user+specifier@domain
+        // remove "+specifier" for all email accounts.
+        $user = preg_replace('#\+.+#', '', $user);
+
+        return sprintf("%s@%s", $user, $domain);
     }
 }
