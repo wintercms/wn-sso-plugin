@@ -18,6 +18,17 @@ return [
 
     'prevent_native_auth' => env('SSO_PREVENT_NATIVE_AUTH', false),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Require Explicit Permission
+    |--------------------------------------------------------------------------
+    |
+    | If true, user must allow connection from specific SSO provider.
+    |
+    | @TODO: Need to add 'allowConnection' setting (per provider) in Backend User Management Page.
+    |
+    */
+
     'require_explicit_permission' => env('SSO_REQUIRE_EXPLICIT_PERMISSION', false),
 
     /*
