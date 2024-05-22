@@ -52,6 +52,20 @@ class Handle extends Controller
         $this->authManager = BackendAuth::instance();
 
         $this->enabledProviders = Config::get('winter.sso::enabled_providers', []);
+
+        Event::listen('backend.auth.login', function ($user) {
+            $runMigrationsOnLogin = (bool) Config::get('cms.runMigrationsOnLogin', Config::get('app.debug', false));
+            if ($runMigrationsOnLogin) {
+                try {
+                    // Load version updates
+                    UpdateManager::instance()->update();
+                } catch (Exception $ex) {
+                    Flash::error($ex->getMessage());
+                }
+            }
+            // Log the sign in event
+            AccessLog::add($user);
+        });
     }
 
     /**
@@ -188,22 +202,6 @@ class Handle extends Controller
                 'remember' => $remember,
             ],
         ]);
-
-        // @TODO: Handle this via an event listener on the backend.auth.login event
-        // and ensure that the event is fired by the AuthManager
-        $runMigrationsOnLogin = (bool) Config::get('cms.runMigrationsOnLogin', Config::get('app.debug', false));
-        if ($runMigrationsOnLogin) {
-            try {
-                // Load version updates
-                UpdateManager::instance()->update();
-            } catch (Exception $ex) {
-                Flash::error($ex->getMessage());
-            }
-        }
-
-        // @TODO: Also handle via event listener
-        // Log the sign in event
-        AccessLog::add($user);
 
         // Redirect to the intended page after successful sign in
         return Backend::redirectIntended('backend');
