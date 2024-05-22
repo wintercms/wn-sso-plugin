@@ -183,9 +183,8 @@ class Handle extends Controller
 
         // Check if the user is allowed to keep a persistent session
         if (is_null($remember = Config::get('cms.backendForceRemember', false))) {
-            $remember = false;
-            // @TODO: Get this from the request
-            // $remember = (bool) post('remember');
+            // @TODO: needs to be saved to the Session on the signin form using an ajax request
+            $remember = Session::pull('backend.forceRemember', false);
         }
 
         $this->authManager->login($user, $remember);
