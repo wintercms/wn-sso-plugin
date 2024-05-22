@@ -256,6 +256,6 @@ class Handle extends Controller
         // remove "+specifier" for all email accounts.
         $user = preg_replace('#\+.+#', '', $user);
 
-        return sprintf("%s@%s", $user, $domain);
+        return $user . '@' . $domain;
     }
 }
