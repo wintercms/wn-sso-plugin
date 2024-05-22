@@ -127,7 +127,8 @@ class Handle extends Controller
 
             if (Config::get('winter.sso::require_explicit_permission', false)) {
                 if (!$user->getSsoValue($provider, 'allowConnection', false)) {
-                    // user has to explicitly enable sso connections
+                    // User has to explicitly enable sso connections
+                    // @TODO: Need to add 'allowConnection' setting (per provider) in Backend User Management Page.
                     throw new AuthenticationException(
                         Lang::get('winter.sso::lang.messages.connection_not_allowed', ['provider' => $provider, 'email' => $email])
                     );
@@ -135,7 +136,7 @@ class Handle extends Controller
             }
             $ssoId = $user->getSsoValue($provider, 'id');
             if (!is_null($ssoId) && $ssoId !== $ssoUser->getId()) {
-                // user has already connected via this SSO provider and the current Id must match the previous one.
+                // User has already connected via this SSO provider and the current Id must match the previous one.
                 throw new AuthenticationException(
                     Lang::get('winter.sso::lang.messages.invalid_ssoid', ['provider' => $provider, 'email' => $email])
                 );

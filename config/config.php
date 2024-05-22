@@ -25,8 +25,6 @@ return [
     |
     | If true, user must allow connection from specific SSO provider.
     |
-    | @TODO: Need to add 'allowConnection' setting (per provider) in Backend User Management Page.
-    |
     */
 
     'require_explicit_permission' => env('SSO_REQUIRE_EXPLICIT_PERMISSION', false),
