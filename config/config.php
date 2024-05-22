@@ -18,6 +18,8 @@ return [
 
     'prevent_native_auth' => env('SSO_PREVENT_NATIVE_AUTH', false),
 
+    'require_explicit_permission' => env('SSO_REQUIRE_EXPLICIT_PERMISSION', false),
+
     /*
     |--------------------------------------------------------------------------
     | Enabled Providers

@@ -10,6 +10,7 @@ return [
     ],
     'messages' => [
         'already_logged_in' => "Vous êtes déjà connecté. Veuillez d'abord vous déconnecter.",
+        'connection_not_allowed' => ":email: la connexion n'est pas permise pour le fournisseur SSO :provider.",
         'invalid_ssoid' => ":email: disparité de l'identifiant pour le fournisseur SSO :provider.",
         'invalid_state' => "État erronée: la requête ne provient pas du fournisseur SSO :provider",
         'inactive_provider' => "Le fournisseur SSO :provider n'est pas activé",

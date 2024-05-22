@@ -119,13 +119,20 @@ class Handle extends Controller
         try {
             /* @TODO: Protection against service saying that root@mydomain.com is authenticated
              * - First need to know if SSO is enabled for current auth manager
-             * - need to know if the user has to explicitly enable it for their account or not,
              * - need to know what services are trusted to validate the user
              * - Need metadata on users to store that information
              */
             $normalizedEmail = $this->normalizeEmail($ssoUser->getEmail());
             $user = $this->authManager->findUserByCredentials(['email' => $normalizedEmail]);
 
+            if (Config::get('winter.sso::require_explicit_permission', false)) {
+                if (!$user->getSsoValue($provider, 'allowConnection', false)) {
+                    // user has to explicitly enable sso connections
+                    throw new AuthenticationException(
+                        Lang::get('winter.sso::lang.messages.connection_not_allowed', ['provider' => $provider, 'email' => $email])
+                    );
+                }
+            }
             $ssoId = $user->getSsoValue($provider, 'id');
             if (!is_null($ssoId) && $ssoId !== $ssoUser->getId()) {
                 // user has already connected via this SSO provider and the current Id must match the previous one.
