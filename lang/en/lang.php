@@ -10,7 +10,8 @@ return [
     ],
     'messages' => [
         'already_logged_in' => 'You are already logged in. Please log out first.',
-        'invalid_state' => 'Invalid state: request is not from the SSO Provider.',
+        'invalid_ssoid' => ':email: Invalid Id for :provider SSO Provider.',
+        'invalid_state' => 'Invalid state: request is not from :provider SSO Provider.',
         'inactive_provider' => 'The :provider: SSO Provider is not enabled.',
         'misconfigured_provider' => 'The :provider: SSO Provider is not properly configured.',
         'register_aborted' => 'New user registration has been aborted by an event handler.',

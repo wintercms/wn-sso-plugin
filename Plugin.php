@@ -104,8 +104,8 @@ class Plugin extends PluginBase
             User::$loginAttribute = 'email';
         }
         User::extend(function ($model) {
-            $model->addDynamicMethod('getSsoValue', function (string $provider, mixed $key) use ($model) {
-                return $model->metadata['winter.sso'][$provider][$key] ?? null;
+            $model->addDynamicMethod('getSsoValue', function (string $provider, mixed $key, $default = null) use ($model) {
+                return $model->metadata['winter.sso'][$provider][$key] ?? $default;
             });
             $model->addDynamicMethod('setSsoValues', function (string $provider, array $values, bool $save = false) use ($model) {
                 $metadata = $model->metadata ?? [];

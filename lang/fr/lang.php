@@ -10,11 +10,12 @@ return [
     ],
     'messages' => [
         'already_logged_in' => "Vous êtes déjà connecté. Veuillez d'abord vous déconnecter.",
-        'invalid_state' => "État erronée: la requête ne provient pas du fournisseur de connexion unique (SSO)",
-        'inactive_provider' => "Le fournisseur de connextion unique :provider n'est pas activé",
-        'misconfigured_provider' => "Le fournisseur de connextion unique :provider n'est pas configuré correctement.",
+        'invalid_ssoid' => ':email: Id invalide pour le fournisseur SSO :provider.',
+        'invalid_state' => "État erronée: la requête ne provient pas du fournisseur SSO :provider",
+        'inactive_provider' => "Le fournisseur SSO :provider n'est pas activé",
+        'misconfigured_provider' => "Le fournisseur SSO :provider n'est pas configuré correctement.",
         'register_aborted' => "L'enregistrement d'un nouvel usager a été avorté par un gestionnaire d'événement.",
-        'signin_aborted' => "La connexion au fournisseur de connexion unique :provider a été avortée par un gestionnaire d'événement.",
+        'signin_aborted' => "La connexion au fournisseur SSO :provider a été avortée par un gestionnaire d'événement.",
         'user_not_found' => "L'usager :user: n'existe pas.",
     ],
     'models' => [
