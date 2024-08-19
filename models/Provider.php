@@ -10,6 +10,7 @@ use Model;
  */
 class Provider extends Model
 {
+    use \Winter\Storm\Database\Traits\Encryptable;
     use \Winter\Storm\Database\Traits\Validation;
 
     /**
@@ -22,6 +23,10 @@ class Provider extends Model
      */
     protected $guarded = ['*'];
 
+    /**
+     * @var array List of attribute names which should be encrypted
+     */
+    protected $encryptable = ['client_secret'];
     /**
      * @var array Fillable fields
      */
