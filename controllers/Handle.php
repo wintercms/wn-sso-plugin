@@ -241,8 +241,7 @@ class Handle extends Controller
         }
 
         if ($this->authManager->getUser()) {
-            // @TODO:
-            // - Handle case of user explicitly attaching a SSO provider to their account
+            // @TODO: Handle case of user explicitly attaching a SSO provider to their account
             Flash::error(Lang::get('winter.sso::lang.messages.already_logged_in'));
             return Backend::redirect('backend');
         }
