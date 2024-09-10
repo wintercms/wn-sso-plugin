@@ -125,6 +125,10 @@ class Plugin extends PluginBase
      */
     public function boot(): void
     {
+        if (config('session.secure') === true && config('session.same_site') === 'strict') {
+            #TODO: find a way to warn user about this
+            Config::set('session.same_site', 'lax');
+        }
         $this->configureProviders();
         $this->extendAuthController();
     }
