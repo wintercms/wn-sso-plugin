@@ -109,11 +109,12 @@ class Handle extends Controller
             }
         } catch (Exception $e) {
             if ($e instanceof InvalidStateException) {
-                Flash::error(Lang::get('winter.sso::lang.messages.invalid_state', ['provider' => $provider]));
+                // session.same_site must be 'lax' or 'none' if session.secure = true
+                $msg = Lang::get('winter.sso::lang.messages.invalid_state', ['provider' => $provider]);
             } else {
-                Flash::error($e->getMessage());
+                $msg = $e->getMessage();
             }
-            return $this->redirectToSignInPage();
+            return $this->redirectToSignInPage($msg);
         }
 
         try {
@@ -143,6 +144,7 @@ class Handle extends Controller
             }
         }
         catch (AuthenticationException $e) {
+            trace_log('authentication exception:', $e->getMessage());
             try {
                 if (Config::get('winter.sso::allow_registration')) {
                     if (method_exists($this->authManager, 'beforeRegister')) {
@@ -179,8 +181,7 @@ class Handle extends Controller
                     );
                 }
             } catch (Exception $e) {
-                Flash::error($e->getMessage());
-                return $this->redirectToSignInPage();
+                return $this->redirectToSignInPage($e->getMessage() ?: get_class($e));
             }
         }
 
@@ -230,28 +231,32 @@ class Handle extends Controller
     public function redirect(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            Flash::error(Lang::get('winter.sso::lang.messages.inactive_provider', ['provider' => $provider]));
-            return $this->redirectToSignInPage();
+            $msg = Lang::get('winter.sso::lang.messages.inactive_provider', ['provider' => $provider]);
+            return $this->redirectToSignInPage($msg);
         }
 
         $config = Config::get('services.' . $provider, []);
         if (!isset($config['client_id'])) {
-            Flash::error(Lang::get('winter.sso::lang.messages.misconfigured_provider', ['provider' => $provider]));
-            return $this->redirectToSignInPage();
+            $msg = Lang::get('winter.sso::lang.messages.misconfigured_provider', ['provider' => $provider]);
+            return $this->redirectToSignInPage($msg);
         }
 
         if ($this->authManager->getUser()) {
             // @TODO: Handle case of user explicitly attaching a SSO provider to their account
-            Flash::error(Lang::get('winter.sso::lang.messages.already_logged_in'));
-            return Backend::redirect('backend');
+            $msg = Lang::get('winter.sso::lang.messages.already_logged_in');
+            return Backend::redirect('backend')->with('message', $msg);
         }
 
         return Socialite::driver($provider)->scopes($config['scopes'] ?? [])->redirect();
     }
 
-    public function redirectToSignInPage()
+    public function redirectToSignInPage($msg = null)
     {
         $signin_url = Session::pull('signin_url', Backend::url('backend/auth/signin'));
+
+        if ($msg) {
+            trace_log($msg);
+        }
         return Redirect::to($signin_url);
     }
 
