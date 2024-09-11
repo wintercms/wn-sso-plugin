@@ -123,8 +123,8 @@ class Handle extends Controller
              * - need to know what services are trusted to validate the user
              * - Need metadata on users to store that information
              */
-            $normalizedEmail = $this->normalizeEmail($ssoUser->getEmail());
-            $user = $this->authManager->findUserByCredentials(['email' => $normalizedEmail]);
+            $email = $this->normalizeEmail($ssoUser->getEmail());
+            $user = $this->authManager->findUserByCredentials(['email' => $email]);
 
             if (Config::get('winter.sso::require_explicit_permission', false)) {
                 if (!$user->getSsoValue($provider, 'allowConnection', false)) {
