@@ -100,7 +100,7 @@ class Handle extends Controller
                 );
             }
 
-            $ssoUser = Socialite::driver($provider)->user();
+            $ssoUser = Socialite::with($provider)->user();
 
             if (method_exists($this->authManager, 'afterSignin')) {
                 $this->authManager->afterSignin($this, $provider, $ssoUser);
@@ -247,7 +247,7 @@ class Handle extends Controller
             return Backend::redirect('backend')->with('message', $msg);
         }
 
-        return Socialite::driver($provider)->scopes($config['scopes'] ?? [])->redirect();
+        return Socialite::with($provider)->scopes($config['scopes'] ?? [])->redirect();
     }
 
     public function redirectToSignInPage($msg = null)
