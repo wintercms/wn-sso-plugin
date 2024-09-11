@@ -108,7 +108,7 @@ class Plugin extends PluginBase
                 return $model->metadata['winter.sso'][$provider][$key] ?? $default;
             });
             $model->addDynamicMethod('setSsoValues', function (string $provider, array $values, bool $save = false) use ($model) {
-                $metadata = $model->metadata ?? [];
+                $metadata = is_array($model->metadata) ? $model->metadata : [];
                 foreach ($values as $key => $value) {
                     $metadata['winter.sso'][$provider][$key] = $value;
                 }
