@@ -13,7 +13,7 @@
             </li>
             <li>In the <strong>Project Name</strong> field, enter a descriptive name for your project. (ex: Winter OAuth)</li>
             <li>
-                Click <strong>Create</strong>. Once the project is created, go to <strong>APIs & Services</strong> &gt; <strong>Credentials</strong>.<br>
+                Click <strong>Create</strong>. Once the project is created, go to <strong>APIs &amp; Services</strong> &gt; <strong>Credentials</strong>.<br>
                 <a target="_blank" href="https://console.cloud.google.com/apis/credentials">https://console.cloud.google.com/apis/credentials</a>
             </li>
             <li>Click <strong>Create credentials</strong>, then select <strong>OAuth client ID</strong> from the menu.</li>
