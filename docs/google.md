@@ -1,7 +1,5 @@
 # Google SSO Setup Instructions
 
->**@TODO**: Update instructions to match latest versions of Google tooling.
-
 <div class="callout callout-info no-subheader">
     <div class="header">
         <i class="icon-info"></i>
@@ -9,26 +7,32 @@
     </div>
     <div class="content">
         <ol>
-            <li>Go to <a target="_blank" href="https://console.developers.google.com/project">https://console.developers.google.com/project</a>
-            <li>Create a new project and call it whatever you want (ex: OctoberOAUTH)</li>
-            <li>Once the project was created, go to:
+            <li>
+                In the Google Cloud console, go to Menu &gt; <strong>IAM &amp; Admin</strong> &gt; <strong>Create a Project</strong>.<br>
+                <a target="_blank" href="https://console.cloud.google.com/projectcreate">https://console.cloud.google.com/projectcreate</a>
+            </li>
+            <li>In the <strong>Project Name</strong> field, enter a descriptive name for your project. (ex: Winter OAuth)</li>
+            <li>
+                Click <strong>Create</strong>. Once the project is created, go to <strong>APIs &amp; Services</strong> &gt; <strong>Credentials</strong>.<br>
+                <a target="_blank" href="https://console.cloud.google.com/apis/credentials">https://console.cloud.google.com/apis/credentials</a>
+            </li>
+            <li>Click <strong>Create credentials</strong>, then select <strong>OAuth client ID</strong> from the menu.</li>
+            <li>If prompted, click <strong>Configure consent screen</strong>. Once configured, go back to <strong>Credentials</strong>.</li>
+            <li>
+                For the <strong>Application type</strong>, select <strong>Web application</strong>.
                 <ul>
-                    <li><strong>API Manager</strong></li>
-                    <li><strong>Credentials</strong></li>
-                    <li><strong>Create credentials</strong></li>
-                    <li><strong>OAuth client ID</strong></li>
+                    <li><strong>Authorized JavaScript origins:</strong> Leave this field blank.</li>
+                    <li><strong>Authorized redirect URIs:</strong> <code>http://localhost/backend/winter/sso/handle/callback/google</code> (replace <code>http://localhost</code> with your domain name)</li>
                 </ul>
             </li>
-            <li>Configure <strong>"consent screen"</strong>(<em>if necessary</em>)</li>
-            <li>On <strong>"Create client ID"</strong> screen, select <strong>"Web application"</strong></li>
-            <li>Fill:
+            <li>Click <strong>Create</strong>. Copy the <strong>Client ID</strong> and <strong>Client secret</strong>.</li>
+            <li>
+                Add the configuration using one of the following ways:
                 <ul>
-                    <li><strong>Authorized JavaScript origins:</strong> <span style="color:green"><?= URL::to('') ?></span> (you can leave this field blank if you want)</li>
-                    <li><strong>Authorized redirect URIs:</strong> <span style="color:green"><?= route('winter.sso.redirect', ['provider' => 'google']); ?></span></li>
+                    <li>Using the <code>config/services.php</code> file. See the <a target="_blank" href="https://socialiteproviders.com/Google-Plus/#add-configuration-to-config-services-php">Socialite Providers documentation</a> for more information.</li>
+                    <li>Using the environment variables: <code>GOOGLE_CLIENT_ID</code>, <code>GOOGLE_CLIENT_SECRET</code>, and <code>GOOGLE_REDIRECT_URI</code>.</li>
                 </ul>
             </li>
-            <li>Click <strong>Create</strong>; a popup will appear with the <strong>"Here is your client ID"</strong> and <strong>"Here is your client secret"</strong>, please, copy and paste in the fields below<br />(now you can close Google Developer Console window)</strong>
-            <li>Save this form, and you're ready to login with your Google account.</li>
         </ol>
     </div>
 </div>
