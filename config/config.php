@@ -33,7 +33,7 @@ return [
         // 'github',
         // 'gitlab',
         // 'google',
-        // 'linkedin',
+        // 'linkedin-openid',
         // 'twitter',
         // 'twitter-oauth-2',
     ],
@@ -112,11 +112,12 @@ return [
             'guzzle' => [],
         ],
 
-        'linkedin' => [
-            'client_id' => env('LINKEDIN_CLIENT_ID'),
-            'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+        'linkedin-openid' => [
+            'client_id' => env('LINKEDIN_OPENID_CLIENT_ID'),
+            'client_secret' => env('LINKEDIN_OPENID_CLIENT_SECRET'),
             'guzzle' => [],
         ],
+
 
         'twitter' => [
             'client_id' => env('TWITTER_CLIENT_ID'),
