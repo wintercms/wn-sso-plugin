@@ -110,9 +110,9 @@ class Plugin extends PluginBase
      */
     public function boot(): void
     {
-        # if secure session is enabled and samesite is strict, that breaks the sso session data from socialite from being saved.
-        if (config('session.secure') === true && config('session.same_site') === 'strict') {
-            #TODO: find a way to warn user about this
+        // Secure sessions with same_site set to strict prevents Socialite's SSO session data from being saved
+        // @TODO: Warn the user about this, perhaps in the system configuration warnings dashboard widget
+        if (Config::get('session.secure') === true && Config::get('session.same_site') === 'strict') {
             Config::set('session.same_site', 'lax');
         }
         $this->configureProviders();
