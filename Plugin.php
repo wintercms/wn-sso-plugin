@@ -88,7 +88,7 @@ class Plugin extends PluginBase
      */
     protected function forceEmailLogin(): void
     {
-        // only do this for the sso callback route, still allow username login for regular signin
+        // Force email login attribute on SSO callback route
         if (str_starts_with(Request::url(), Backend::url('winter/sso/handle/callback/'))) {
             User::$loginAttribute = 'email';
         }
