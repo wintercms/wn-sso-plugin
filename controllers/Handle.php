@@ -161,6 +161,10 @@ class Handle extends Controller
             return Redirect::back();
         }
 
-        return Socialite::driver($provider)->redirect();
+        $config = Config::get('services.' . $provider, []);
+
+        return Socialite::driver($provider)
+            ->scopes($config['scopes'] ?? [])
+            ->redirect();
     }
 }

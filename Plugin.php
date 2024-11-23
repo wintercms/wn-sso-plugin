@@ -10,6 +10,8 @@ use Event;
 use Lang;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
 use Url;
@@ -86,7 +88,11 @@ class Plugin extends PluginBase
      */
     protected function forceEmailLogin(): void
     {
-        User::$loginAttribute = 'email';
+        // Force email login attribute on SSO callback route
+        if (str_starts_with(Request::url(), Backend::url('winter/sso/handle/callback/'))) {
+            User::$loginAttribute = 'email';
+        }
+
         User::extend(function ($model) {
             $model->addDynamicMethod('getSsoId', function (string $provider) use ($model) {
                 return $model->metadata['winter.sso'][$provider]['id'] ?? null;
@@ -104,6 +110,11 @@ class Plugin extends PluginBase
      */
     public function boot(): void
     {
+        // Secure sessions with same_site set to strict prevents Socialite's SSO session data from being saved
+        // @TODO: Warn the user about this, perhaps in the system configuration warnings dashboard widget
+        if (Config::get('session.secure') === true && Config::get('session.same_site') === 'strict') {
+            Config::set('session.same_site', 'lax');
+        }
         $this->configureProviders();
         $this->extendAuthController();
     }
@@ -142,22 +153,12 @@ class Plugin extends PluginBase
     {
         // Extend the signin view to add the SSO buttons for the enabled providers
         Event::listen('backend.auth.extendSigninView', function ($controller) {
-            $buttonsHtml = '';
-
-            foreach (Config::get('winter.sso::enabled_providers', []) as $provider) {
-                $providerName = Lang::get("winter.sso::lang.providers.$provider");
-                $buttonsHtml .= View::make("winter.sso::buttons.provider", [
-                    'logoUrl' => Url::asset('/plugins/winter/sso/assets/images/providers/' . $provider . '.svg'),
-                    'logoAlt' => Lang::get('winter.sso::lang.provider_btn.alt_text', ['provider' => $providerName]),
-                    'url' => Backend::url('winter/sso/handle/redirect/' . $provider),
-                    'label' => Lang::get('winter.sso::lang.provider_btn.label', ['provider' => $providerName]),
-                ]);
-            }
-
             $controller->addCss('/plugins/winter/sso/assets/dist/css/sso.css', 'Winter.SSO');
 
-            if (!empty($buttonsHtml)) {
-                echo $buttonsHtml;
+            if ($view = View::make("winter.sso::providers", ['providers' => Config::get('winter.sso::enabled_providers', [])])) {
+                // save signin_url to redirect
+                Session::put('signin_url', Request::url());
+                echo $view;
             }
         });
     }
