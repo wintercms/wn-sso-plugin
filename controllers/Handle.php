@@ -12,6 +12,7 @@ use Flash;
 use Illuminate\Http\RedirectResponse;
 use Redirect;
 use Request;
+use Session;
 use Socialite;
 use System\Classes\UpdateManager;
 use Winter\SSO\Models\Log;
@@ -57,7 +58,8 @@ class Handle extends Controller
     public function callback(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            abort(404);
+            Flash::error("This provider is not enabled.");
+            return $this->redirectToSigninPage();
         }
 
         // @TODO: Login or register the user / provide an event for plugins to handle
@@ -69,7 +71,8 @@ class Handle extends Controller
             $ssoUser = Socialite::with($provider)->user();
         } else {
             // there was an error
-            throw new AuthenticationException(Request::input('error') . ': ' . Request::input('error_description'));
+            Flash::error(Request::input('error') . ': ' . Request::input('error_description'));
+            return $this->redirectToSigninPage();
         }
 
         try {
@@ -96,7 +99,8 @@ class Handle extends Controller
             // ]);
             // $user->setSsoConfig('allow_password_auth', false);
             // @TODO: Event here for registering user if desired, default fallback abort behaviour
-            abort(403, 'User not found');
+            Flash::error("User not found.");
+            return $this->redirectToSigninPage();
         }
 
         if (
@@ -155,7 +159,8 @@ class Handle extends Controller
     public function redirect(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            abort(404);
+            Flash::error("This provider is not enabled.");
+            return $this->redirectToSigninPage();
         }
 
         if ($this->authManager->getUser()) {
@@ -190,5 +195,10 @@ class Handle extends Controller
         $user = preg_replace('#\+.+#', '', $user);
 
         return $user . '@' . $domain;
+    }
+
+    public function redirectToSigninPage()
+    {
+        return Redirect::to(Session::pull('signin_url', Backend::url('backend/auth/signin')));
     }
 }
