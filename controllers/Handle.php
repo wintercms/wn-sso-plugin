@@ -188,7 +188,6 @@ class Handle extends Controller
             return $this->redirectToSigninPage();
         }
         return $response;
-
     }
 
     /*
