@@ -94,13 +94,18 @@ class Plugin extends PluginBase
         }
 
         User::extend(function ($model) {
-            $model->addDynamicMethod('getSsoId', function (string $provider) use ($model) {
-                return $model->metadata['winter.sso'][$provider]['id'] ?? null;
+            $model->addDynamicMethod('getSsoValue', function (string $provider, mixed $key, $default = null) use ($model) {
+                return $model->metadata['winter.sso'][$provider][$key] ?? $default;
             });
-            $model->addDynamicMethod('setSsoId', function (string $provider, string $id) use ($model) {
-                $metadata = $model->metadata ?? [];
-                $metadata['winter.sso'][$provider]['id'] = $id;
+            $model->addDynamicMethod('setSsoValues', function (string $provider, array $values, bool $save = false) use ($model) {
+                $metadata = is_array($model->metadata) ? $model->metadata : [];
+                foreach ($values as $key => $value) {
+                    $metadata['winter.sso'][$provider][$key] = $value;
+                }
                 $model->metadata = $metadata;
+                if ($save) {
+                    $model->save();
+                }
             });
         });
     }
