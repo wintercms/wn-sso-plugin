@@ -107,10 +107,7 @@ class Handle extends Controller
             return $this->redirectToSigninPage($msg);
         }
 
-        if (
-            $ssoUser->getId()
-            && $user->getSsoValue($provider, 'id') !== $ssoUser->getId()
-        ) {
+        if ($ssoUser->getId() && $user->getSsoValue($provider, 'id') !== $ssoUser->getId()) {
             // @TODO: Check if request / user is allowed to associate this account to this provider's ID
             $user->setSsoValues($provider, ['id' => $ssoUser->getId()]);
             $user->save();
@@ -122,7 +119,15 @@ class Handle extends Controller
             $remember = Session::pull('backend.forceRemember', false);
         }
 
+        if ($user->methodExists('beforeLogin')) {
+            $user->beforeLogin();
+        }
+
         $this->authManager->login($user, $remember);
+
+        if ($user->methodExists('afterLogin')) {
+            $user->afterLogin();
+        }
 
         Log::create([
             'provider' => $provider,
