@@ -65,7 +65,12 @@ class Handle extends Controller
         // or backend or even both. If event is used follow naming conventions from in progress
         // issues
 
-        $ssoUser = Socialite::driver($provider)->user();
+        if (Request::input('code')) {
+            $ssoUser = Socialite::with($provider)->user();
+        } else {
+            // there was an error
+            throw new AuthenticationException(Request::input('error') . ': ' . Request::input('error_description'));
+        }
 
         try {
             // @TODO: Protection against service saying that root@mydomain.com is authenticated
@@ -75,7 +80,8 @@ class Handle extends Controller
             // - need to know if the user has already connected via SSO and if so what is the ID
             // for the current service because that MUST match the returned result here.
             // - Need metadata on users to store that information
-            $user = $this->authManager->findUserByCredentials(['email' => $ssoUser->getEmail()]);
+            $email = $this->normalizeEmail($ssoUser->getEmail());
+            $user = $this->authManager->findUserByCredentials(['email' => $email]);
         } catch (AuthenticationException $e) {
             $user = null;
         }
@@ -95,18 +101,17 @@ class Handle extends Controller
 
         if (
             $ssoUser->getId()
-            && $user->getSsoId($provider) !== $ssoUser->getId()
+            && $user->getSsoValue($provider, 'id') !== $ssoUser->getId()
         ) {
             // @TODO: Check if request / user is allowed to associate this account to this provider's ID
-            $user->setSsoId($provider, $ssoUser->getId());
+            $user->setSsoValues($provider, ['id' => $ssoUser->getId()]);
             $user->save();
         }
 
         // Check if the user is allowed to keep a persistent session
         if (is_null($remember = Config::get('cms.backendForceRemember', false))) {
-            $remember = false;
-            // @TODO: Get this from the request
-            // $remember = (bool) post('remember');
+            // @TODO: needs to be saved to the Session on the signin form using an ajax request
+            $remember = Session::pull('backend.forceRemember', false);
         }
 
         $this->authManager->login($user, $remember);
@@ -163,8 +168,27 @@ class Handle extends Controller
 
         $config = Config::get('services.' . $provider, []);
 
-        return Socialite::driver($provider)
+        return Socialite::with($provider)
             ->scopes($config['scopes'] ?? [])
             ->redirect();
+    }
+
+    /*
+     * Returns canonical form for google emails.
+     * Remove +specifier after any email username
+     */
+    public function normalizeEmail($email)
+    {
+        [$user, $domain] = explode('@', $email);
+
+        if (in_array($domain, ['gmail.com', 'googlemail.com'])) {
+            // Google emails can have "." anywhere in the username but the actual account has none.
+            $user = str_replace('.', '', $user);
+        }
+        # user+specifier@domain
+        # remove "+specifier" for all email accounts.
+        $user = preg_replace('#\+.+#', '', $user);
+
+        return $user . '@' . $domain;
     }
 }
