@@ -209,7 +209,7 @@ class Handle extends Controller
         return $user . '@' . $domain;
     }
 
-    public function redirectToSigninPage()
+    public function redirectToSigninPage(): RedirectResponse
     {
         return Redirect::to(Session::pull('signin_url', Backend::url('backend/auth/signin')));
     }
