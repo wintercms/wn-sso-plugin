@@ -205,7 +205,15 @@ class Handle extends Controller
             $remember = Session::pull('backend.forceRemember', false);
         }
 
+        if ($user->methodExists('beforeLogin')) {
+            $user->beforeLogin();
+        }
+
         $this->authManager->login($user, $remember);
+
+        if ($user->methodExists('afterLogin')) {
+            $user->afterLogin();
+        }
 
         Log::create([
             'provider' => $provider,
@@ -247,9 +255,41 @@ class Handle extends Controller
             return Backend::redirect('backend')->with('message', $msg);
         }
 
-        return Socialite::driver($provider)
-            ->scopes($config['scopes'] ?? [])
-            ->redirect();
+        try {
+            $response = Socialite::with($provider)
+                ->scopes($config['scopes'] ?? [])
+                ->redirect();
+        } catch (\Exception $e) {
+            return $this->redirectToSigninPage($e->getMessage());
+        }
+        return $response;
+    }
+
+    /*
+     * Returns canonical form for google emails.
+     * Remove +specifier after any email username
+     */
+    public function normalizeEmail($email)
+    {
+        [$user, $domain] = explode('@', $email);
+
+        if (in_array($domain, ['gmail.com', 'googlemail.com'])) {
+            // Google emails can have "." anywhere in the username but the actual account has none.
+            $user = str_replace('.', '', $user);
+        }
+        # user+specifier@domain
+        # remove "+specifier" for all email accounts.
+        $user = preg_replace('#\+.+#', '', $user);
+
+        return $user . '@' . $domain;
+    }
+
+    public function redirectToSigninPage($msg = null): RedirectResponse
+    {
+        if ($msg) {
+            Flash::error($msg);
+        }
+        return Redirect::to(Session::pull('signin_url', Backend::url('backend/auth/signin')));
     }
 
     public function redirectToSignInPage($msg = null)
