@@ -2,22 +2,22 @@
 
 namespace Winter\SSO\Controllers;
 
-use Backend;
+use Backend\Facades\Backend;
 use Backend\Classes\Controller;
 use Backend\Models\AccessLog;
-use BackendAuth;
-use Config;
+use Backend\Facades\BackendAuth;
 use Exception;
-use Flash;
 use Illuminate\Http\RedirectResponse;
-use Redirect;
-use Request;
-use Session;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
 use Socialite;
 use System\Classes\UpdateManager;
 use Winter\SSO\Models\Log;
 use Winter\Storm\Auth\AuthenticationException;
 use Winter\Storm\Auth\Manager as AuthManager;
+use Winter\Storm\Support\Facades\Config;
+use Winter\Storm\Support\Facades\Flash;
 
 /**
  * Handle SSO Backend Controller
@@ -149,8 +149,8 @@ class Handle extends Controller
             try {
                 // Load version updates
                 UpdateManager::instance()->update();
-            } catch (Exception $ex) {
-                Flash::error($ex->getMessage());
+            } catch (Exception $e) {
+                Flash::error($e->getMessage());
             }
         }
 
@@ -185,7 +185,7 @@ class Handle extends Controller
             $response = Socialite::with($provider)
                 ->scopes($config['scopes'] ?? [])
                 ->redirect();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->redirectToSigninPage($e->getMessage());
         }
         return $response;
