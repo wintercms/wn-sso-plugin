@@ -247,7 +247,9 @@ class Handle extends Controller
             return Backend::redirect('backend')->with('message', $msg);
         }
 
-        return Socialite::with($provider)->scopes($config['scopes'] ?? [])->redirect();
+        return Socialite::driver($provider)
+            ->scopes($config['scopes'] ?? [])
+            ->redirect();
     }
 
     public function redirectToSignInPage($msg = null)

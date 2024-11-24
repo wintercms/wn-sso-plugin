@@ -9,8 +9,8 @@ use Config;
 use Event;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
-use Request;
-use Session;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
 use View;
@@ -99,10 +99,11 @@ class Plugin extends PluginBase
      */
     protected function forceEmailLogin(): void
     {
-        // only do this for the sso callback route, still allow username login for regular signin
+        // Force email login attribute on SSO callback route
         if (str_starts_with(Request::url(), Backend::url('winter/sso/handle/callback/'))) {
             User::$loginAttribute = 'email';
         }
+
         User::extend(function ($model) {
             $model->addDynamicMethod('getSsoValue', function (string $provider, mixed $key, $default = null) use ($model) {
                 return $model->metadata['winter.sso'][$provider][$key] ?? $default;
@@ -125,8 +126,9 @@ class Plugin extends PluginBase
      */
     public function boot(): void
     {
-        if (config('session.secure') === true && config('session.same_site') === 'strict') {
-            #TODO: find a way to warn user about this
+        // Secure sessions with same_site set to strict prevents Socialite's SSO session data from being saved
+        // @TODO: Warn the user about this, perhaps in the system configuration warnings dashboard widget
+        if (Config::get('session.secure') === true && Config::get('session.same_site') === 'strict') {
             Config::set('session.same_site', 'lax');
         }
         $this->configureProviders();

@@ -56,7 +56,6 @@ return [
         'github' => 'Github',
         'gitlab' => 'GitLab',
         'google' => 'Google',
-        'linkedin' => 'LinkedIn',
         'linkedin-openid' => 'LinkedIn (OpenID)',
         'twitter' => 'Twitter',
     ],
