@@ -58,8 +58,7 @@ class Handle extends Controller
     public function callback(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            Flash::error("This provider is not enabled.");
-            return $this->redirectToSigninPage();
+            return $this->redirectToSigninPage('This provider is not enabled');
         }
 
         // @TODO: Login or register the user / provide an event for plugins to handle
@@ -68,15 +67,14 @@ class Handle extends Controller
         // issues
 
         if (!Request::input('code')) {
-            $msg = 'Error: no access token was returned by provider ' . $provider;
+            $msg = 'Error: no access token was returned by provider (' . $provider . ')';
             if ($error = Request::input('error')) {
                 $msg = $provider . ' error: ' . $error;
                 if ($errorDescription = Request::input('error_description')) {
                     $msg .= ' (' . $errorDescription . ')';
                 }
             }
-            Flash::error($msg);
-            return $this->redirectToSigninPage();
+            return $this->redirectToSigninPage($msg);
         }
 
         $ssoUser = Socialite::with($provider)->user();
@@ -105,8 +103,8 @@ class Handle extends Controller
             // ]);
             // $user->setSsoConfig('allow_password_auth', false);
             // @TODO: Event here for registering user if desired, default fallback abort behaviour
-            Flash::error("Winter AuthManager: User '" . $email . "' not found.");
-            return $this->redirectToSigninPage();
+            $msg = 'Winter AuthManager: User "' . $email . '" not found.';
+            return $this->redirectToSigninPage($msg);
         }
 
         if (
@@ -165,15 +163,14 @@ class Handle extends Controller
     public function redirect(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            Flash::error("This provider is not enabled.");
-            return $this->redirectToSigninPage();
+            return $this->redirectToSigninPage('This provider is not enabled');
         }
 
         if ($this->authManager->getUser()) {
             // @TODO:
             // - Handle case of user explicitly attaching a SSO provider to their account
             // - Localization
-            Flash::error("You are already logged in. Please log out first.");
+            Flash::error('You are already logged in. Please log out first.');
             return Redirect::back();
         }
 
@@ -184,8 +181,7 @@ class Handle extends Controller
                 ->scopes($config['scopes'] ?? [])
                 ->redirect();
         } catch (\Exception $e) {
-            Flash::error($e->getMessage());
-            return $this->redirectToSigninPage();
+            return $this->redirectToSigninPage($e->getMessage());
         }
         return $response;
     }
@@ -209,8 +205,11 @@ class Handle extends Controller
         return $user . '@' . $domain;
     }
 
-    public function redirectToSigninPage(): RedirectResponse
+    public function redirectToSigninPage($msg = null): RedirectResponse
     {
+        if ($msg) {
+            Flash::error($msg);
+        }
         return Redirect::to(Session::pull('signin_url', Backend::url('backend/auth/signin')));
     }
 }
