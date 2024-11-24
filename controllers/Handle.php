@@ -67,13 +67,19 @@ class Handle extends Controller
         // or backend or even both. If event is used follow naming conventions from in progress
         // issues
 
-        if (Request::input('code')) {
-            $ssoUser = Socialite::with($provider)->user();
-        } else {
-            // there was an error
-            Flash::error(Request::input('error') . ': ' . Request::input('error_description'));
+        if (!Request::input('code')) {
+            $msg = 'Error: no access token was returned by provider ' . $provider;
+            if ($error = Request::input('error')) {
+                $msg = $provider . ' error: ' . $error;
+                if ($errorDescription = Request::input('error_description')) {
+                    $msg .= ' (' . $errorDescription . ')';
+                }
+            }
+            Flash::error($msg);
             return $this->redirectToSigninPage();
         }
+
+        $ssoUser = Socialite::with($provider)->user();
 
         try {
             // @TODO: Protection against service saying that root@mydomain.com is authenticated
@@ -99,7 +105,7 @@ class Handle extends Controller
             // ]);
             // $user->setSsoConfig('allow_password_auth', false);
             // @TODO: Event here for registering user if desired, default fallback abort behaviour
-            Flash::error("User not found.");
+            Flash::error("Winter AuthManager: User '" . $email . "' not found.");
             return $this->redirectToSigninPage();
         }
 
@@ -173,9 +179,16 @@ class Handle extends Controller
 
         $config = Config::get('services.' . $provider, []);
 
-        return Socialite::with($provider)
+        try {
+            $response = Socialite::with($provider)
             ->scopes($config['scopes'] ?? [])
             ->redirect();
+        } catch (\Exception $e) {
+            Flash::error($e->getMessage());
+            return $this->redirectToSigninPage();
+        }
+        return $response;
+
     }
 
     /*
