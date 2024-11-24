@@ -7,14 +7,12 @@ use Backend\Models\User;
 use Backend\Models\UserRole;
 use Config;
 use Event;
-use Lang;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
-use Url;
 use View;
 
 /**
@@ -54,6 +52,11 @@ class Plugin extends PluginBase
                 'tab' => 'winter.sso::lang.plugin.name',
                 'roles' => [UserRole::CODE_DEVELOPER],
             ],
+            'winter.sso.view_providers' => [
+                'label' => 'winter.sso::lang.permissions.view_providers',
+                'tab' => 'winter.sso::lang.plugin.name',
+                'roles' => [UserRole::CODE_DEVELOPER],
+            ],
         ];
     }
 
@@ -70,6 +73,14 @@ class Plugin extends PluginBase
                 'url'         => Backend::url('winter/sso/logs'),
                 'permissions' => ['winter.sso.view_logs'],
                 'category'    => SettingsManager::CATEGORY_LOGS,
+            ],
+            'providers' => [
+                'label'       => 'winter.sso::lang.models.provider.label_plural',
+                'description' => 'winter.sso::lang.models.provider.menu_description',
+                'icon'        => 'icon-openid',
+                'url'         => Backend::url('winter/sso/providers'),
+                'permissions' => ['winter.sso.view_providers'],
+                'category'    => SettingsManager::CATEGORY_SYSTEM,
             ],
         ];
     }
@@ -94,13 +105,18 @@ class Plugin extends PluginBase
         }
 
         User::extend(function ($model) {
-            $model->addDynamicMethod('getSsoId', function (string $provider) use ($model) {
-                return $model->metadata['winter.sso'][$provider]['id'] ?? null;
+            $model->addDynamicMethod('getSsoValue', function (string $provider, mixed $key, $default = null) use ($model) {
+                return $model->metadata['winter.sso'][$provider][$key] ?? $default;
             });
-            $model->addDynamicMethod('setSsoId', function (string $provider, string $id) use ($model) {
-                $metadata = $model->metadata ?? [];
-                $metadata['winter.sso'][$provider]['id'] = $id;
+            $model->addDynamicMethod('setSsoValues', function (string $provider, array $values, bool $save = false) use ($model) {
+                $metadata = is_array($model->metadata) ? $model->metadata : [];
+                foreach ($values as $key => $value) {
+                    $metadata['winter.sso'][$provider][$key] = $value;
+                }
                 $model->metadata = $metadata;
+                if ($save) {
+                    $model->save();
+                }
             });
         });
     }

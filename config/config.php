@@ -20,6 +20,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Require Explicit Permission
+    |--------------------------------------------------------------------------
+    |
+    | If true, user must allow connection from specific SSO provider.
+    |
+    */
+
+    'require_explicit_permission' => env('SSO_REQUIRE_EXPLICIT_PERMISSION', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Enabled Providers
     |--------------------------------------------------------------------------
     |
