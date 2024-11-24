@@ -181,8 +181,8 @@ class Handle extends Controller
 
         try {
             $response = Socialite::with($provider)
-            ->scopes($config['scopes'] ?? [])
-            ->redirect();
+                ->scopes($config['scopes'] ?? [])
+                ->redirect();
         } catch (\Exception $e) {
             Flash::error($e->getMessage());
             return $this->redirectToSigninPage();
