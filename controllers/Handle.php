@@ -210,10 +210,10 @@ class Handle extends Controller
         return $user . '@' . $domain;
     }
 
-    public function redirectToSigninPage($msg = null): RedirectResponse
+    public function redirectToSigninPage(string $message = null): RedirectResponse
     {
-        if ($msg) {
-            Flash::error($msg);
+        if ($message) {
+            Flash::error($message);
         }
         return Redirect::to(Session::pull('signin_url', Backend::url('backend/auth/signin')));
     }
