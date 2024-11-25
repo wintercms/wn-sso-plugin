@@ -197,15 +197,17 @@ class Handle extends Controller
      */
     public function normalizeEmail($email)
     {
-        [$user, $domain] = explode('@', $email);
+        [$user, $domain] = explode('@', strtolower($email));
 
         if (in_array($domain, ['gmail.com', 'googlemail.com'])) {
             // Google emails can have "." anywhere in the username but the actual account has none.
             $user = str_replace('.', '', $user);
         }
-        # user+specifier@domain
-        # remove "+specifier" for all email accounts.
-        $user = preg_replace('#\+.+#', '', $user);
+        if (Config::get('winter.sso::remove_plus_addressing', false)) {
+            # user+specifier@domain
+            # remove "+specifier" for all email accounts.
+            $user = preg_replace('#\+.+#', '', $user);
+        }
 
         return $user . '@' . $domain;
     }
