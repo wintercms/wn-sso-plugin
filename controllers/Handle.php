@@ -58,7 +58,7 @@ class Handle extends Controller
     public function callback(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            return $this->redirectToSigninPage('This provider is not enabled');
+            return $this->redirectToSigninPage("The {$provider} SSO provider is not enabled");
         }
 
         // @TODO: Login or register the user / provide an event for plugins to handle
