@@ -69,7 +69,7 @@ class Handle extends Controller
         if (!Request::input('code')) {
             $message = 'Error: no access token was returned by provider (' . $provider . ')';
             if ($error = Request::input('error')) {
-                $message = $provider . ' error: ' . $error;
+                $message = $provider . ' SSO error: ' . $error;
                 if ($errorDescription = Request::input('error_description')) {
                     $message .= ' (' . $errorDescription . ')';
                 }
