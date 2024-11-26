@@ -116,10 +116,7 @@ class Handle extends Controller
         }
 
         // Check if the user is allowed to keep a persistent session
-        if (is_null($remember = Config::get('cms.backendForceRemember', false))) {
-            // @TODO: needs to be saved to the Session on the signin form using an ajax request
-            $remember = Session::pull('backend.forceRemember', false);
-        }
+        $remember = Config::get('cms.backendForceRemember', false);
 
         if ($user->methodExists('beforeLogin')) {
             $user->beforeLogin();
