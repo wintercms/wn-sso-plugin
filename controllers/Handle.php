@@ -67,6 +67,7 @@ class Handle extends Controller
         // issues
 
         if (!Request::input('code')) {
+            // ref. https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
             $message = 'Error: no access token was returned by provider (' . $provider . ')';
             if ($error = Request::input('error')) {
                 $message = $provider . ' SSO error: ' . $error;
