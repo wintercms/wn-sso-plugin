@@ -8,6 +8,17 @@ return [
     'permissions' => [
         'view_logs' => 'Voir les logs',
     ],
+    'messages' => [
+        'already_logged_in' => "Vous êtes déjà connecté. Veuillez d'abord vous déconnecter.",
+        'connection_not_allowed' => ":email: la connexion n'est pas permise pour le fournisseur SSO :provider.",
+        'invalid_ssoid' => ":email: disparité de l'identifiant pour le fournisseur SSO :provider.",
+        'invalid_state' => "État erronée: la requête ne provient pas du fournisseur SSO :provider",
+        'inactive_provider' => "Le fournisseur SSO :provider n'est pas activé",
+        'misconfigured_provider' => "Le fournisseur SSO :provider n'est pas configuré correctement.",
+        'register_aborted' => "L'enregistrement d'un nouvel usager a été avorté par un gestionnaire d'événement.",
+        'signin_aborted' => "La connexion au fournisseur SSO :provider a été avortée par un gestionnaire d'événement.",
+        'user_not_found' => "L'usager :user: n'existe pas.",
+    ],
     'models' => [
         'general' => [
             'id' => 'ID',
@@ -24,15 +35,6 @@ return [
             'provided_id' => 'Identifiant fourni',
             'provided_email' => 'Email fourni',
         ],
-    ],
-    'providers' => [
-        'bitbucket' => 'Bitbucket',
-        'facebook' => 'Facebook',
-        'github' => 'Github',
-        'gitlab' => 'GitLab',
-        'google' => 'Google',
-        'linkedin' => 'LinkedIn',
-        'twitter' => 'Twitter',
     ],
     'provider_btn' => [
         'label' => 'Connexion avec :provider',
