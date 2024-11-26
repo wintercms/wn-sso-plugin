@@ -15,7 +15,6 @@ return [
         'invalid_state' => "État erronée: la requête ne provient pas du fournisseur SSO :provider",
         'inactive_provider' => "Le fournisseur SSO :provider n'est pas activé",
         'misconfigured_provider' => "Le fournisseur SSO :provider n'est pas configuré correctement.",
-        'register_aborted' => "L'enregistrement d'un nouvel usager a été avorté par un gestionnaire d'événement.",
         'signin_aborted' => "La connexion au fournisseur SSO :provider a été avortée par un gestionnaire d'événement.",
         'user_not_found' => "L'usager :user: n'existe pas.",
     ],
