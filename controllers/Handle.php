@@ -117,6 +117,8 @@ class Handle extends Controller
         }
 
         // Check if the user is allowed to keep a persistent session
+        // @TODO: Support "null" as an option (where the user selects the remember me checkbox before logging in,
+        // will probably require storing a flag in the session before redirecting them to the SSO provider login URL
         $remember = Config::get('cms.backendForceRemember', false);
 
         if ($user->methodExists('beforeLogin')) {
