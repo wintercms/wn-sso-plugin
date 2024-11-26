@@ -168,7 +168,7 @@ class Handle extends Controller
     public function redirect(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            return $this->redirectToSigninPage('This provider is not enabled');
+            return $this->redirectToSigninPage("The {$provider} SSO provider is not enabled");
         }
 
         if ($this->authManager->getUser()) {
