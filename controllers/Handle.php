@@ -103,8 +103,7 @@ class Handle extends Controller
             // ]);
             // $user->setSsoConfig('allow_password_auth', false);
             // @TODO: Event here for registering user if desired, default fallback abort behaviour
-            $msg = 'Winter AuthManager: User not found (' . $email . ')';
-            return $this->redirectToSigninPage($msg);
+            return $this->redirectToSigninPage("An account for $email could not be found.");
         }
 
         if ($ssoUser->getId() && $user->getSsoValue($provider, 'id') !== $ssoUser->getId()) {
