@@ -207,7 +207,7 @@ class Handle extends Controller
         return $user . '@' . $domain;
     }
 
-    public function redirectToSigninPage(string $message = null): RedirectResponse
+    protected function redirectToSigninPage(string $message = null): RedirectResponse
     {
         if ($message) {
             Flash::error($message);
