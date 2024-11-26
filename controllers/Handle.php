@@ -67,14 +67,14 @@ class Handle extends Controller
         // issues
 
         if (!Request::input('code')) {
-            $msg = 'Error: no access token was returned by provider (' . $provider . ')';
+            $message = 'Error: no access token was returned by provider (' . $provider . ')';
             if ($error = Request::input('error')) {
-                $msg = $provider . ' error: ' . $error;
+                $message = $provider . ' error: ' . $error;
                 if ($errorDescription = Request::input('error_description')) {
-                    $msg .= ' (' . $errorDescription . ')';
+                    $message .= ' (' . $errorDescription . ')';
                 }
             }
-            return $this->redirectToSigninPage($msg);
+            return $this->redirectToSigninPage($message);
         }
 
         $ssoUser = Socialite::with($provider)->user();
