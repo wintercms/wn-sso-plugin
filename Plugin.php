@@ -103,6 +103,7 @@ class Plugin extends PluginBase
                     $metadata['winter.sso'][$provider][$key] = $value;
                 }
                 $model->metadata = $metadata;
+                $model->save();
             });
         });
     }
