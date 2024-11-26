@@ -193,7 +193,6 @@ class Handle extends Controller
 
     /*
      * Returns canonical form for google emails.
-     * Remove +specifier after any email username
      */
     public function normalizeEmail($email)
     {
@@ -203,12 +202,6 @@ class Handle extends Controller
             // Google emails can have "." anywhere in the username but the actual account has none.
             $user = str_replace('.', '', $user);
         }
-        if (Config::get('winter.sso::remove_plus_addressing', false)) {
-            # user+specifier@domain
-            # remove "+specifier" for all email accounts.
-            $user = preg_replace('#\+.+#', '', $user);
-        }
-
         return $user . '@' . $domain;
     }
 
