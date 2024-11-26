@@ -2,26 +2,26 @@
 
 namespace Winter\SSO\Controllers;
 
-use Backend;
-use BackendAuth;
+use Event;
+use Backend\Facades\Backend;
 use Backend\Classes\Controller;
 use Backend\Models\AccessLog;
-use Config;
-use Event;
+use Backend\Facades\BackendAuth;
 use Exception;
-use Flash;
 use Illuminate\Http\RedirectResponse;
 use Lang;
 use Laravel\Socialite\Two\InvalidStateException;
 use Laravel\Socialite\Two\User as SocialiteUser;
-use Redirect;
-use Request;
-use Session;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
 use Socialite;
 use System\Classes\UpdateManager;
 use Winter\SSO\Models\Log;
 use Winter\Storm\Auth\AuthenticationException;
 use Winter\Storm\Auth\Manager as AuthManager;
+use Winter\Storm\Support\Facades\Config;
+use Winter\Storm\Support\Facades\Flash;
 
 /**
  * Handle SSO Backend Controller
@@ -243,81 +243,47 @@ class Handle extends Controller
             return $this->redirectToSignInPage($msg);
         }
 
+        if ($this->authManager->getUser()) {
+            // @TODO: Handle case of user explicitly attaching a SSO provider to their account
+            Flash::error(Lang::get('winter.sso::lang.messages.already_logged_in'));
+            return Redirect::back();
+        }
+
         $config = Config::get('services.' . $provider, []);
         if (!isset($config['client_id'])) {
             $msg = Lang::get('winter.sso::lang.messages.misconfigured_provider', ['provider' => $provider]);
             return $this->redirectToSignInPage($msg);
         }
 
-        if ($this->authManager->getUser()) {
-            // @TODO: Handle case of user explicitly attaching a SSO provider to their account
-            $msg = Lang::get('winter.sso::lang.messages.already_logged_in');
-            return Backend::redirect('backend')->with('message', $msg);
-        }
-
         try {
             $response = Socialite::with($provider)
                 ->scopes($config['scopes'] ?? [])
                 ->redirect();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->redirectToSigninPage($e->getMessage());
         }
         return $response;
     }
 
-    /*
-     * Returns canonical form for google emails.
-     * Remove +specifier after any email username
+    /**
+     * Canonicalize the provided email based on domain name.
      */
-    public function normalizeEmail($email)
+    protected function normalizeEmail($email)
     {
-        [$user, $domain] = explode('@', $email);
+        [$user, $domain] = explode('@', strtolower($email));
 
         if (in_array($domain, ['gmail.com', 'googlemail.com'])) {
             // Google emails can have "." anywhere in the username but the actual account has none.
             $user = str_replace('.', '', $user);
         }
-        # user+specifier@domain
-        # remove "+specifier" for all email accounts.
-        $user = preg_replace('#\+.+#', '', $user);
-
         return $user . '@' . $domain;
     }
 
-    public function redirectToSigninPage($msg = null): RedirectResponse
+    protected function redirectToSigninPage(string $message = null): RedirectResponse
     {
-        if ($msg) {
-            Flash::error($msg);
+        if ($message) {
+            Flash::error($message);
         }
         return Redirect::to(Session::pull('signin_url', Backend::url('backend/auth/signin')));
-    }
-
-    public function redirectToSignInPage($msg = null)
-    {
-        $signin_url = Session::pull('signin_url', Backend::url('backend/auth/signin'));
-
-        if ($msg) {
-            trace_log($msg);
-        }
-        return Redirect::to($signin_url);
-    }
-
-    /*
-     * Returns canonical form for google emails.
-     * Remove +specifier after any email username
-     */
-    public function normalizeEmail($email)
-    {
-        [$user, $domain] = explode('@', $email);
-
-        if (in_array($domain, ['gmail.com', 'googlemail.com'])) {
-            // Google emails can have "." anywhere in the username but the actual account has none.
-            $user = str_replace('.', '', $user);
-        }
-        // user+specifier@domain
-        // remove "+specifier" for all email accounts.
-        $user = preg_replace('#\+.+#', '', $user);
-
-        return $user . '@' . $domain;
     }
 }
