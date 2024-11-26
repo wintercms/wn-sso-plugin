@@ -193,10 +193,10 @@ class Handle extends Controller
         return $response;
     }
 
-    /*
-     * Returns canonical form for google emails.
+    /**
+     * Canonicalize the provided email based on domain name.
      */
-    public function normalizeEmail($email)
+    protected function normalizeEmail($email)
     {
         [$user, $domain] = explode('@', strtolower($email));
 
