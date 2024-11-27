@@ -52,20 +52,6 @@ class Handle extends Controller
         $this->authManager = BackendAuth::instance();
 
         $this->enabledProviders = Config::get('winter.sso::enabled_providers', []);
-
-        Event::listen('backend.auth.login', function ($user) {
-            $runMigrationsOnLogin = (bool) Config::get('cms.runMigrationsOnLogin', Config::get('app.debug', false));
-            if ($runMigrationsOnLogin) {
-                try {
-                    // Load version updates
-                    UpdateManager::instance()->update();
-                } catch (Exception $e) {
-                    Flash::error($e->getMessage());
-                }
-            }
-            // Log the sign in event
-            AccessLog::add($user);
-        });
     }
 
     /**
