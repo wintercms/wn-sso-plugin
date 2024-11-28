@@ -7,7 +7,7 @@ columns:
         label: 'winter.sso::lang.models.general.created_at'
         type: datetime
         searchable: true
-        sortable:
+        sortable: true
     provider:
         label: winter.sso::lang.models.log.provider
         type: text
