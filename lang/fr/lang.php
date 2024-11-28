@@ -8,7 +8,7 @@ return [
     'permissions' => [
         'view_logs' => 'Voir les logs',
     ],
-    'messages' => [
+    'errors' => [
         'already_logged_in' => "Vous êtes déjà connecté. Veuillez d'abord vous déconnecter.",
         'authentication_aborted' => "La connexion au fournisseur SSO :provider a été avortée par un gestionnaire d'événement.",
         'email_not_found' => "L'usager :email: n'existe pas.",
