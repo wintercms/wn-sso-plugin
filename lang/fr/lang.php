@@ -10,13 +10,12 @@ return [
     ],
     'messages' => [
         'already_logged_in' => "Vous êtes déjà connecté. Veuillez d'abord vous déconnecter.",
-        'connection_not_allowed' => ":email: la connexion n'est pas permise pour le fournisseur SSO :provider.",
+        'authentication_aborted' => "La connexion au fournisseur SSO :provider a été avortée par un gestionnaire d'événement.",
+        'email_not_found' => "L'usager :email: n'existe pas.",
         'invalid_ssoid' => ":email: disparité de l'identifiant pour le fournisseur SSO :provider.",
         'invalid_state' => "État erronée: la requête ne provient pas du fournisseur SSO :provider",
-        'inactive_provider' => "Le fournisseur SSO :provider n'est pas activé",
-        'misconfigured_provider' => "Le fournisseur SSO :provider n'est pas configuré correctement.",
-        'signin_aborted' => "La connexion au fournisseur SSO :provider a été avortée par un gestionnaire d'événement.",
-        'user_not_found' => "L'usager :user: n'existe pas.",
+        'provider_blocked' => ":email: la connexion n'est pas permise pour le fournisseur SSO :provider.",
+        'provider_disabled' => "Le fournisseur SSO :provider n'est pas activé",
     ],
     'models' => [
         'general' => [

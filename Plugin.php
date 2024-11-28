@@ -2,20 +2,18 @@
 
 namespace Winter\SSO;
 
-use Backend;
+use Backend\Facades\Backend;
 use Backend\Models\User;
 use Backend\Models\UserRole;
-use Config;
-use Event;
-use Lang;
-use Laravel\Socialite\Facades\Socialite;
-use Laravel\Socialite\SocialiteServiceProvider;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
+use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\SocialiteServiceProvider;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
-use Url;
-use View;
+use Winter\Storm\Support\Facades\Config;
+use Winter\Storm\Support\Facades\Event;
 
 /**
  * SSO Plugin Information File
