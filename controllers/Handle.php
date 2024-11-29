@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
@@ -16,7 +17,7 @@ use Laravel\Socialite\Two\InvalidStateException;
 use Socialite;
 use Winter\SSO\Exceptions\InvalidSsoIdException;
 use Winter\SSO\Exceptions\ProviderBlockedException;
-use Winter\SSO\Models\Log;
+use Winter\SSO\Models\Log as SsoLog;
 use Winter\Storm\Auth\AuthenticationException;
 use Winter\Storm\Auth\Manager as AuthManager;
 use Winter\Storm\Exception\SystemException;
@@ -189,7 +190,7 @@ class Handle extends Controller
             $user->afterLogin();
         }
 
-        Log::create([
+        SsoLog::create([
             'provider' => $provider,
             'action' => 'authenticated',
             'user_type' => get_class($user),
@@ -215,7 +216,7 @@ class Handle extends Controller
     {
         if (!in_array($provider, $this->enabledProviders)) {
             $message = Lang::get('winter.sso::lang.errors.provider_disabled', ['provider' => $provider]);
-            \Log::error($message);
+            Log::error($message);
             return $this->redirectToSignInPage($message);
         }
 
@@ -228,7 +229,7 @@ class Handle extends Controller
         $config = Config::get('services.' . $provider, []);
         if (!isset($config['client_id'])) {
             $message = Lang::get('winter.sso::lang.errors.missing_client_id', ['provider' => $provider]);
-            \Log::error($message);
+            Log::error($message);
             return $this->redirectToSignInPage($message);
         }
 
