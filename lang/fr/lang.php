@@ -14,6 +14,7 @@ return [
         'email_not_found' => "L'usager :email: n'existe pas.",
         'invalid_ssoid' => ":email: disparité de l'identifiant pour le fournisseur SSO :provider.",
         'invalid_state' => "État erronée: la requête ne provient pas du fournisseur SSO :provider",
+        'missing_client_id' => "L'identifiant client pour le fournisseur SSO :provider n'est pas configuré.",
         'provider_blocked' => ":email: la connexion n'est pas permise pour le fournisseur SSO :provider.",
         'provider_disabled' => "Le fournisseur SSO :provider n'est pas activé",
     ],

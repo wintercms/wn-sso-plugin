@@ -214,7 +214,9 @@ class Handle extends Controller
     public function redirect(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            throw new SystemException("The $provider SSO provider is not enabled.");
+            $message = Lang::get('winter.sso::lang.errors.provider_disabled', ['provider' => $provider]);
+            \Log::error($message);
+            return $this->redirectToSignInPage($message);
         }
 
         if ($this->authManager->getUser()) {
@@ -225,7 +227,9 @@ class Handle extends Controller
 
         $config = Config::get('services.' . $provider, []);
         if (!isset($config['client_id'])) {
-            throw new SystemException("The $provider SSO provider does not have a client_id configured.");
+            $message = Lang::get('winter.sso::lang.errors.missing_client_id', ['provider' => $provider]);
+            \Log::error($message);
+            return $this->redirectToSignInPage($message);
         }
 
         try {
