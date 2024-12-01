@@ -2,22 +2,28 @@
 
 namespace Winter\SSO\Controllers;
 
-use Backend\Facades\Backend;
 use Backend\Classes\Controller;
-use Backend\Models\AccessLog;
+use Backend\Facades\Backend;
 use Backend\Facades\BackendAuth;
 use Exception;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
+use Laravel\Socialite\Two\InvalidStateException;
 use Socialite;
-use System\Classes\UpdateManager;
-use Winter\SSO\Models\Log;
+use Winter\SSO\Exceptions\InvalidSsoIdException;
+use Winter\SSO\Exceptions\ProviderBlockedException;
+use Winter\SSO\Models\Log as SsoLog;
 use Winter\Storm\Auth\AuthenticationException;
 use Winter\Storm\Auth\Manager as AuthManager;
+use Winter\Storm\Exception\SystemException;
 use Winter\Storm\Support\Facades\Config;
 use Winter\Storm\Support\Facades\Flash;
+use Winter\Storm\Support\Str;
 
 /**
  * Handle SSO Backend Controller
@@ -52,74 +58,127 @@ class Handle extends Controller
 
     /**
      * Processes a callback from the SSO provider
-     * @throws HttpException if the provider is not enabled
-     * @throws HttpException if the user cannot be found
+     * Redirects back to signin form on errors with Flash message.
      */
     public function callback(string $provider): RedirectResponse
     {
-        if (!in_array($provider, $this->enabledProviders)) {
-            return $this->redirectToSigninPage("The {$provider} SSO provider is not enabled");
+        try {
+            if (!in_array($provider, $this->enabledProviders)) {
+                throw new Exception(Lang::get('winter.sso::lang.errors.provider_disabled', ['provider' => $provider]));
+            }
+            if (!Request::input('code')) {
+                throw new Exception(sprintf("%s: %s", Request::input('error'), Request::input('error_description')));
+            }
+
+            $result = Event::fire("winter.sso.$provider.authenticating", [], halt: true);
+            if ($result === false) {
+                throw new Exception(
+                    Lang::get('winter.sso::lang.errors.authentication_aborted', ['provider' => $provider])
+                );
+            }
+
+            $ssoUser = Socialite::with($provider)->user();
+
+            Event::fire("winter.sso.$provider.authenticated", [$ssoUser]);
+        } catch (Exception $e) {
+            if ($e instanceof InvalidStateException) {
+                $message = Lang::get('winter.sso::lang.errors.invalid_state', ['provider' => $provider]);
+            } else {
+                $message = $e->getMessage();
+            }
+            return $this->redirectToSignInPage($message);
         }
 
-        // @TODO: Login or register the user / provide an event for plugins to handle
-        // user registration themselves. Would like plugin to be able to handle frontend
-        // or backend or even both. If event is used follow naming conventions from in progress
-        // issues
+        $email = $this->normalizeEmail($ssoUser->getEmail());
+        try {
+            /**
+             * @TODO: Protection against service saying that root@mydomain.com is authenticated
+             * - First need to know if SSO is enabled for current auth manager
+             * - need to know what services are trusted to validate the user
+             */
+            $user = $this->authManager->findUserByCredentials(['email' => $email]);
 
-        if (!Request::input('code')) {
-            // ref. https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
-            $message = 'Error: no access token was returned by provider (' . $provider . ')';
-            if ($error = Request::input('error')) {
-                $message = $provider . ' SSO error: ' . $error;
-                if ($errorDescription = Request::input('error_description')) {
-                    $message .= ' (' . $errorDescription . ')';
+            if (Config::get('winter.sso::require_explicit_permission', false)) {
+                if (!$user->getSsoValue($provider, 'allowConnection', false)) {
+                    // User has to explicitly enable sso connections
+                    // @TODO: Need to add 'allowConnection' setting (per provider) in Backend User Management Page.
+                    throw new ProviderBlockedException(
+                        Lang::get('winter.sso::lang.errors.provider_blocked', ['provider' => $provider, 'email' => $email])
+                    );
                 }
             }
-            return $this->redirectToSigninPage($message);
-        }
-
-        $ssoUser = Socialite::with($provider)->user();
-
-        try {
-            // @TODO: Protection against service saying that root@mydomain.com is authenticated
-            // - First need to know if SSO is enabled for current auth manager
-            // - need to know if the user has to explicitly enable it for their account or not,
-            // - need to know what services are trusted to validate the user
-            // - need to know if the user has already connected via SSO and if so what is the ID
-            // for the current service because that MUST match the returned result here.
-            // - Need metadata on users to store that information
-            $email = $this->normalizeEmail($ssoUser->getEmail());
-            $user = $this->authManager->findUserByCredentials(['email' => $email]);
+            $ssoId = $user->getSsoValue($provider, 'id');
+            if (
+                !is_null($ssoId)
+                && $ssoUser->getId() !== $ssoId
+            ) {
+                // User has already connected via this SSO provider and the current ID must match the previous one.
+                throw new InvalidSsoIdException(
+                    Lang::get('winter.sso::lang.errors.invalid_ssoid', ['provider' => $provider, 'email' => $email])
+                );
+            }
         } catch (AuthenticationException $e) {
-            $user = null;
+            if (
+                $e instanceof InvalidSsoIdException
+                || $e instanceof ProviderBlockedException
+            ) {
+                return $this->redirectToSignInPage($e->getMessage());
+            }
+
+            try {
+                if (Config::get('winter.sso::allow_registration', false)) {
+                    $password = Str::random(400);
+                    $user = $this->authManager->register(
+                        credentials: [
+                            'email' => $email,
+                            'password' => $password,
+                            'password_confirmation' => $password,
+                            'name' => $ssoUser->getName(),
+                        ],
+                        autoLogin: true
+                    );
+                    // Disable password authentication for users created via SSO
+                    // @TODO: actually check this value and prevent password authentication
+                    $user->setSsoValues($provider, ['allow_password_auth' => false]);
+                } else {
+                    // If the email was not found and registration via SSO is disabled
+                    throw new AuthenticationException(
+                        Lang::get('winter.sso::lang.errors.email_not_found', ['email' => $email])
+                    );
+                }
+            } catch (AuthenticationException $ex) {
+                return $this->redirectToSignInPage($ex->getMessage());
+            }
         }
 
-        if (!$user) {
-            // $password = Str::random(400);
-            // $user = $this->authManager->register([
-            //     'email' => $ssoUser->getEmail(),
-            //     'password' => $password,
-            //     'password_confirmation' => $password,
-            //     'name' => $ssoUser->getName(),
-            // ]);
-            // $user->setSsoConfig('allow_password_auth', false);
-            // @TODO: Event here for registering user if desired, default fallback abort behaviour
-            return $this->redirectToSigninPage("An account for $email could not be found.");
-        }
-
+        $data = [];
         if (
             $ssoUser->getId()
             && $user->getSsoValue($provider, 'id') !== $ssoUser->getId()
         ) {
             // @TODO: Check if request / user is allowed to associate this account to this provider's ID
-            $user->setSsoValues($provider, ['id' => $ssoUser->getId()]);
-            $user->save();
+            $data['id'] = $ssoUser->getId();
+        }
+
+        if (
+            $ssoUser->token
+            && $user->getSsoValue($provider, 'token') !== $ssoUser->token
+        ) {
+            $data['token'] = $ssoUser->token;
+        }
+
+        if ($data) {
+            $user->setSsoValues($provider, $data);
         }
 
         // Check if the user is allowed to keep a persistent session
+        $remember = Config::get('cms.backendForceRemember', false);
+
         // @TODO: Support "null" as an option (where the user selects the remember me checkbox before logging in,
         // will probably require storing a flag in the session before redirecting them to the SSO provider login URL
-        $remember = Config::get('cms.backendForceRemember', false);
+        if (is_null($remember)) {
+            $remember = false;
+        }
 
         if ($user->methodExists('beforeLogin')) {
             $user->beforeLogin();
@@ -131,34 +190,18 @@ class Handle extends Controller
             $user->afterLogin();
         }
 
-        Log::create([
+        SsoLog::create([
             'provider' => $provider,
             'action' => 'authenticated',
             'user_type' => get_class($user),
             'user_id' => $user->getKey(),
             'provided_id' => $ssoUser->getId(),
-            'provided_email' => $ssoUser->getEmail(),
+            'provided_email' => $email,
             'ip' => Request::ip(),
             'metadata' => [
                 'remember' => $remember,
             ],
         ]);
-
-        // @TODO: Handle this via an event listener on the backend.auth.login event
-        // and ensure that the event is fired by the AuthManager
-        $runMigrationsOnLogin = (bool) Config::get('cms.runMigrationsOnLogin', Config::get('app.debug', false));
-        if ($runMigrationsOnLogin) {
-            try {
-                // Load version updates
-                UpdateManager::instance()->update();
-            } catch (Exception $e) {
-                Flash::error($e->getMessage());
-            }
-        }
-
-        // @TODO: Also handle via event listener
-        // Log the sign in event
-        AccessLog::add($user);
 
         // Redirect to the intended page after successful sign in
         return Backend::redirectIntended('backend');
@@ -166,22 +209,29 @@ class Handle extends Controller
 
     /**
      * Redirects the user to the authentication page of the given provider.
+     * Redirects back to signin form on errors with Flash message.
+     * @throws SystemException if the SSO provider is not enabled or is misconfigured.
      */
     public function redirect(string $provider): RedirectResponse
     {
         if (!in_array($provider, $this->enabledProviders)) {
-            return $this->redirectToSigninPage("The {$provider} SSO provider is not enabled");
+            $message = Lang::get('winter.sso::lang.errors.provider_disabled', ['provider' => $provider]);
+            Log::error($message);
+            return $this->redirectToSignInPage($message);
         }
 
         if ($this->authManager->getUser()) {
-            // @TODO:
-            // - Handle case of user explicitly attaching a SSO provider to their account
-            // - Localization
-            Flash::error('You are already logged in. Please log out first.');
+            // @TODO: Handle case of user explicitly attaching a SSO provider to their account
+            Flash::error(Lang::get('winter.sso::lang.errors.already_logged_in'));
             return Redirect::back();
         }
 
         $config = Config::get('services.' . $provider, []);
+        if (!isset($config['client_id'])) {
+            $message = Lang::get('winter.sso::lang.errors.missing_client_id', ['provider' => $provider]);
+            Log::error($message);
+            return $this->redirectToSignInPage($message);
+        }
 
         try {
             $response = Socialite::with($provider)
@@ -200,8 +250,8 @@ class Handle extends Controller
     {
         [$user, $domain] = explode('@', strtolower($email));
 
+        // Google emails can have "." anywhere in the username but the actual account has none.
         if (in_array($domain, ['gmail.com', 'googlemail.com'])) {
-            // Google emails can have "." anywhere in the username but the actual account has none.
             $user = str_replace('.', '', $user);
         }
         return $user . '@' . $domain;

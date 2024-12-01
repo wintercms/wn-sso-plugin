@@ -2,20 +2,19 @@
 
 namespace Winter\SSO;
 
-use Backend;
+use Backend\Facades\Backend;
 use Backend\Models\User;
 use Backend\Models\UserRole;
-use Config;
-use Event;
-use Lang;
-use Laravel\Socialite\Facades\Socialite;
-use Laravel\Socialite\SocialiteServiceProvider;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
+use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\SocialiteServiceProvider;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
-use Url;
-use View;
+use Winter\Storm\Exception\ApplicationException;
+use Winter\Storm\Support\Facades\Config;
+use Winter\Storm\Support\Facades\Event;
 
 /**
  * SSO Plugin Information File
@@ -103,6 +102,7 @@ class Plugin extends PluginBase
                     $metadata['winter.sso'][$provider][$key] = $value;
                 }
                 $model->metadata = $metadata;
+                $model->save();
             });
         });
     }
@@ -163,6 +163,20 @@ class Plugin extends PluginBase
                 echo $view;
             }
         });
+
+        if (Config::get('winter.sso::prevent_native_auth', false))  {
+            \Backend\Controllers\Auth::extend(function ($controller) {
+                // Disable the login form visually
+                $controller->addViewPath(plugins_path('winter/sso/controllers/auth/prevent_native'));
+
+                // Disable server processing of any auth AJAX handlers to protect against manually crafted requests
+                $controller->bindEvent('ajax.beforeRunHandler', function ($handler) {
+                    if ($handler === 'onSubmit') {
+                        throw new ApplicationException("Native authentication is disabled.");
+                    }
+                });
+            });
+        }
     }
 
     /**

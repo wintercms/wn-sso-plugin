@@ -2,7 +2,7 @@
 
 namespace Winter\SSO\Models;
 
-use Model;
+use Winter\Storm\Database\Model;
 
 /**
  * Log Model

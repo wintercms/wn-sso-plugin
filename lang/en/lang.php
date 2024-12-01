@@ -8,6 +8,16 @@ return [
     'permissions' => [
         'view_logs' => 'View logs',
     ],
+    'errors' => [
+        'already_logged_in' => 'You are already logged in. Please log out first.',
+        'authentication_aborted' => 'Authentication has been aborted by an event handler for the :provider SSO Provider.',
+        'email_not_found' => 'The provided email :email does not exist.',
+        'invalid_ssoid' => ':email: ID mismatch for :provider SSO Provider.',
+        'invalid_state' => 'Invalid state: request is not from :provider SSO Provider.',
+        'missing_client_id' => 'The :provider SSO provider does not have a client_id configured.',
+        'provider_blocked' => "The :provider SSO provider is not enabled for :email.",
+        'provider_disabled' => "The :provider SSO provider is not enabled.",
+    ],
     'models' => [
         'general' => [
             'id' => 'ID',
