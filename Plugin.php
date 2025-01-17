@@ -5,6 +5,7 @@ namespace Winter\SSO;
 use Backend\Facades\Backend;
 use Backend\Models\User;
 use Backend\Models\UserRole;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
@@ -12,6 +13,7 @@ use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
+use Url;
 use Winter\Storm\Exception\ApplicationException;
 use Winter\Storm\Support\Facades\Config;
 use Winter\Storm\Support\Facades\Event;
@@ -157,7 +159,31 @@ class Plugin extends PluginBase
         Event::listen('backend.auth.extendSigninView', function ($controller) {
             $controller->addCss('/plugins/winter/sso/assets/dist/css/sso.css', 'Winter.SSO');
 
-            if ($view = View::make("winter.sso::providers", ['providers' => Config::get('winter.sso::enabled_providers', [])])) {
+            $enabledProviders = Config::get('winter.sso::enabled_providers', []);
+
+            $processedProviders = collect($enabledProviders)->mapWithKeys(function ($value, $key) {
+                // Determine if the provider is using the simple or advanced format
+                if (is_array($value)) {
+                    $provider = $key;
+                    $providerData = $value;
+                } else {
+                    $provider = $value;
+                    $providerData = [];
+                }
+            
+                // Preprocess provider data with defaults
+                return [
+                    $provider => [
+                        'view' => $providerData['view'] ?? "winter.sso::buttons.provider",
+                        'logoUrl' => $providerData['logoUrl'] ?? Url::asset('/plugins/winter/sso/assets/images/providers/' . $provider . '.svg'),
+                        'logoAlt' => $providerData['logoAlt'] ?? Lang::get('winter.sso::lang.provider_btn.alt_text', ['provider' => ucfirst($provider)]),
+                        'url' => $providerData['url'] ?? Backend::url('winter/sso/handle/redirect/' . $provider),
+                        'label' => $providerData['label'] ?? Lang::get('winter.sso::lang.provider_btn.label', ['provider' => ucfirst($provider)]),
+                    ],
+                ];
+            })->toArray();
+
+            if ($view = View::make("winter.sso::providers", ['providers' => $processedProviders])) {
                 // save signin_url to redirect
                 Session::put('signin_url', Request::url());
                 echo $view;
