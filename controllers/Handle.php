@@ -133,7 +133,8 @@ class Handle extends Controller
                             'email' => $email,
                             'password' => $password,
                             'password_confirmation' => $password,
-                            'first_name' => $ssoUser->getName()
+                            'first_name' => $ssoUser->user['given_name'] ?: null,
+                            'last_name' => $ssoUser->user['family_name'] ?: null,
                             'login' => $ssoUser->getNickname(),
                         ],
                         autoLogin: true
