@@ -140,6 +140,7 @@ class Handle extends Controller
                     // Disable password authentication for users created via SSO
                     // @TODO: actually check this value and prevent password authentication
                     $user->setSsoValues($provider, ['allow_password_auth' => false]);
+                    Event::fire("winter.sso.$provider.registered", [$user]);
                 } else {
                     // If the email was not found and registration via SSO is disabled
                     throw new AuthenticationException(
