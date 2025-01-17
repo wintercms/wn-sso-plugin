@@ -133,7 +133,7 @@ class Handle extends Controller
                             'email' => $email,
                             'password' => $password,
                             'password_confirmation' => $password,
-                            'name' => $ssoUser->getName(),
+                            'login' => $ssoUser->getNickname(),
                         ],
                         autoLogin: true
                     );
