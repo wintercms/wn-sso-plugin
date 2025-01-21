@@ -159,29 +159,12 @@ class Plugin extends PluginBase
         Event::listen('backend.auth.extendSigninView', function ($controller) {
             $controller->addCss('/plugins/winter/sso/assets/dist/css/sso.css', 'Winter.SSO');
 
+            $providers = $this->getProviders();
             $enabledProviders = Config::get('winter.sso::enabled_providers', []);
-
-            $processedProviders = collect($enabledProviders)->mapWithKeys(function ($value, $key) {
-                // Determine if the provider is using the simple or advanced format
-                if (is_array($value)) {
-                    $provider = $key;
-                    $providerData = $value;
-                } else {
-                    $provider = $value;
-                    $providerData = [];
-                }
-            
-                // Preprocess provider data with defaults
-                return [
-                    $provider => [
-                        'view' => $providerData['view'] ?? "winter.sso::buttons.provider",
-                        'logoUrl' => $providerData['logoUrl'] ?? Url::asset('/plugins/winter/sso/assets/images/providers/' . $provider . '.svg'),
-                        'logoAlt' => $providerData['logoAlt'] ?? Lang::get('winter.sso::lang.provider_btn.alt_text', ['provider' => ucfirst($provider)]),
-                        'url' => $providerData['url'] ?? Backend::url('winter/sso/handle/redirect/' . $provider),
-                        'label' => $providerData['label'] ?? Lang::get('winter.sso::lang.provider_btn.label', ['provider' => ucfirst($provider)]),
-                    ],
-                ];
-            })->toArray();
+            $processedProviders = [];
+            foreach ($enabledProviders as $provider) {
+                $processedProviders[$provider] = $providers[$provider]['button'];
+            }
 
             if ($view = View::make("winter.sso::providers", ['providers' => $processedProviders])) {
                 // save signin_url to redirect
@@ -212,5 +195,24 @@ class Plugin extends PluginBase
     {
         $this->app->register(SocialiteServiceProvider::class);
         $this->app->alias('Socialite', Socialite::class);
+    }
+
+    /**
+     * Get the array of providers with their configuration
+     */
+    protected function getProviders(): array
+    {
+        $providers = Config::get('winter.sso::providers', []);
+        foreach ($providers as $provider => &$config) {
+            $config['button'] = array_merge([
+                'view'    => "winter.sso::buttons.provider",
+                'logoUrl' => Url::asset('/plugins/winter/sso/assets/images/providers/' . $provider . '.svg'),
+                'logoAlt' => Lang::get('winter.sso::lang.provider_btn.alt_text', ['provider' => ucfirst($provider)]),
+                'url'     => Backend::url('winter/sso/handle/redirect/' . $provider),
+                'label'   => Lang::get('winter.sso::lang.provider_btn.label', ['provider' => ucfirst($provider)]),
+            ], $config['button'] ?? []);
+        }
+
+        return $providers;
     }
 }
