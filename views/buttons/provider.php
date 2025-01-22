@@ -15,7 +15,7 @@
                 <div class="mr-0 ml-3 w-px h-6 text-center bg-gray-400"></div>
             </div>
         <?php endif; ?>
-        <div class="flex-1 -ml-9 font-sans leading-6 text-cyan-700">
+        <div class="flex-1 <?php if ($logoUrl) : ?>-ml-9<?php endif; ?> font-sans leading-6 text-cyan-700">
             <p class="m-0 font-medium leading-7 cursor-pointer">
                 <?= e($label); ?>
             </p>
