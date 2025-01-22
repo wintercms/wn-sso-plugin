@@ -2,7 +2,7 @@
 
 $buttonsHtml = '';
 foreach ($providers as $provider => $data) {
-    $buttonsHtml .= View::make("winter.sso::buttons.provider", $data['view'], [
+    $buttonsHtml .= View::make($data['view'] ?? "winter.sso::buttons.provider", [
         'logoUrl' => $data['logoUrl'],
         'logoAlt' => $data['logoAlt'],
         'url' => $data['url'],
