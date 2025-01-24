@@ -133,7 +133,7 @@ class Handle extends Controller
                             'email' => $email,
                             'password' => $password,
                             'password_confirmation' => $password,
-                            'login' => $ssoUser->getNickname(),
+                            'login' => $ssoUser->getNickname() ?: $email,
                         ],
                         autoLogin: true
                     );
@@ -143,7 +143,7 @@ class Handle extends Controller
                     /**
                      * @event winter.sso.$provider.registered
                      * Fires after a User record is registered by the AuthManager
-                     * 
+                     *
                      * Example usage:
                      *
                      *     Event::listen('winter.sso.google.registered', function (\Backend\Models\User $user, \Laravel\Socialite\AbstractUser $ssoUser) {
