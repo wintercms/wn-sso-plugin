@@ -5,6 +5,7 @@ namespace Winter\SSO;
 use Backend\Facades\Backend;
 use Backend\Models\User;
 use Backend\Models\UserRole;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
@@ -12,6 +13,7 @@ use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
+use Url;
 use Winter\Storm\Exception\ApplicationException;
 use Winter\Storm\Support\Facades\Config;
 use Winter\Storm\Support\Facades\Event;
@@ -157,7 +159,14 @@ class Plugin extends PluginBase
         Event::listen('backend.auth.extendSigninView', function ($controller) {
             $controller->addCss('/plugins/winter/sso/assets/dist/css/sso.css', 'Winter.SSO');
 
-            if ($view = View::make("winter.sso::providers", ['providers' => Config::get('winter.sso::enabled_providers', [])])) {
+            $providers = $this->getProviders();
+            $enabledProviders = Config::get('winter.sso::enabled_providers', []);
+            $processedProviders = [];
+            foreach ($enabledProviders as $provider) {
+                $processedProviders[$provider] = $providers[$provider]['button'];
+            }
+
+            if ($view = View::make("winter.sso::providers", ['providers' => $processedProviders])) {
                 // save signin_url to redirect
                 Session::put('signin_url', Request::url());
                 echo $view;
@@ -186,5 +195,24 @@ class Plugin extends PluginBase
     {
         $this->app->register(SocialiteServiceProvider::class);
         $this->app->alias('Socialite', Socialite::class);
+    }
+
+    /**
+     * Get the array of providers with their configuration
+     */
+    protected function getProviders(): array
+    {
+        $providers = Config::get('winter.sso::providers', []);
+        foreach ($providers as $provider => &$config) {
+            $config['button'] = array_merge([
+                'view'    => "winter.sso::buttons.provider",
+                'logoUrl' => Url::asset('/plugins/winter/sso/assets/images/providers/' . $provider . '.svg'),
+                'logoAlt' => Lang::get('winter.sso::lang.provider_btn.alt_text', ['provider' => ucfirst($provider)]),
+                'url'     => Backend::url('winter/sso/handle/redirect/' . $provider),
+                'label'   => Lang::get('winter.sso::lang.provider_btn.label', ['provider' => ucfirst($provider)]),
+            ], $config['button'] ?? []);
+        }
+
+        return $providers;
     }
 }

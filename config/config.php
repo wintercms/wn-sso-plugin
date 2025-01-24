@@ -89,6 +89,10 @@ return [
     | that will be integrated with, such as GitHub, Facebook, Twitter, etc.
     | These values will be mirrored to the services.* config namespace.
     |
+    | Providers can have the way their button is rendered configured with the
+    | optional 'button' => ['view' => '', 'logoUrl' => '', 'logoAlt' => '',
+    | 'url' => '', 'label' => ''] config property.
+    |
     */
 
     'providers' => [
