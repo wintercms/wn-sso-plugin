@@ -133,13 +133,29 @@ class Handle extends Controller
                             'email' => $email,
                             'password' => $password,
                             'password_confirmation' => $password,
-                            'name' => $ssoUser->getName(),
+                            'login' => $ssoUser->getNickname() ?: $email,
                         ],
                         autoLogin: true
                     );
                     // Disable password authentication for users created via SSO
                     // @TODO: actually check this value and prevent password authentication
                     $user->setSsoValues($provider, ['allow_password_auth' => false]);
+                    /**
+                     * @event winter.sso.$provider.registered
+                     * Fires after a User record is registered by the AuthManager
+                     *
+                     * Example usage:
+                     *
+                     *     Event::listen('winter.sso.google.registered', function (\Backend\Models\User $user, \Laravel\Socialite\AbstractUser $ssoUser) {
+                     *         $user->fill([
+                     *             'first_name' => $ssoUser->user['given_name'] ?: null,
+                     *             'last_name' => $ssoUser->user['family_name'] ?: null,
+                     *         ]);
+                     *         $user->save();
+                     *     });
+                     *
+                     */
+                    Event::fire("winter.sso.$provider.registered", [$user, $ssoUser]);
                 } else {
                     // If the email was not found and registration via SSO is disabled
                     throw new AuthenticationException(
