@@ -179,12 +179,14 @@ class Plugin extends PluginBase
             }
 
             // Disable the login form visually
-            $controller->addViewPath(plugins_path('winter/sso/controllers/auth/prevent_native'));
+            $controller->bindEvent('page.beforeDisplay', function () use ($controller) {
+                $controller->addViewPath(plugins_path('winter/sso/controllers/auth/prevent_native'));
+            });
         
             // Disable server processing of any auth AJAX handlers to protect against manually crafted requests
             $controller->bindEvent('ajax.beforeRunHandler', function ($handler) {
                 if ($handler === 'onSubmit') {
-                throw new ApplicationException("Native authentication is disabled.");
+                    throw new ApplicationException("Native authentication is disabled.");
                 }
             });
         });
