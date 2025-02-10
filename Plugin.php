@@ -174,7 +174,7 @@ class Plugin extends PluginBase
         });
 
         \Backend\Controllers\Auth::extend(function ($controller) {
-            if (Config::get('winter.sso::prevent_native_auth', false)) {
+            if (!Config::get('winter.sso::prevent_native_auth', false)) {
                 return;
             }
 
