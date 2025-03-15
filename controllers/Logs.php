@@ -4,6 +4,7 @@ namespace Winter\SSO\Controllers;
 
 use BackendMenu;
 use Backend\Classes\Controller;
+use System\Classes\SettingsManager;
 
 /**
  * Logs Backend Controller
@@ -24,6 +25,12 @@ class Logs extends Controller
     {
         parent::__construct();
 
-        BackendMenu::setContext('Winter.SSO', 'sso', 'logs');
+        BackendMenu::setContext('Winter.System', 'system', 'settings');
+        SettingsManager::setContext('Winter.SSO', 'logs');
+    }
+
+    public function update($id)
+    {
+        return \Redirect::to($this->actionUrl('preview', $id));
     }
 }
