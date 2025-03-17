@@ -33,6 +33,11 @@ class Logs extends Controller
     {
         return \Redirect::to($this->actionUrl('preview', $id));
     }
+
+    public function update_onSave()
+    {
+        abort(404);
+    }    
     
     public function create()
     {
