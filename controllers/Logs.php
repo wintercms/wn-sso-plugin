@@ -31,7 +31,7 @@ class Logs extends Controller
 
     public function update($id)
     {
-        return \Redirect::to($this->actionUrl('preview', $id));
+        abort(404);
     }
 
     public function update_onSave()
