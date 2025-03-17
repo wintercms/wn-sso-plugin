@@ -33,4 +33,9 @@ class Logs extends Controller
     {
         return \Redirect::to($this->actionUrl('preview', $id));
     }
+    
+    public function create()
+    {
+        abort(404);
+    }
 }
