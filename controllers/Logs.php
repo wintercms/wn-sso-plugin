@@ -19,6 +19,8 @@ class Logs extends Controller
         \Backend\Behaviors\ListController::class,
     ];
 
+    public $hiddenActions = ['create', 'update'];
+
     public $requiredPermissions = ['winter.sso.view_logs'];
 
     public function __construct()
@@ -27,20 +29,5 @@ class Logs extends Controller
 
         BackendMenu::setContext('Winter.System', 'system', 'settings');
         SettingsManager::setContext('Winter.SSO', 'logs');
-    }
-
-    public function update($id)
-    {
-        abort(404);
-    }
-
-    public function update_onSave()
-    {
-        abort(404);
-    }    
-    
-    public function create()
-    {
-        abort(404);
     }
 }
