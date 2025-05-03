@@ -12,7 +12,7 @@ modelClass: Winter\SSO\Models\Log
 title: 'winter.sso::lang.models.log.label_plural'
 
 # Link URL for each record
-recordUrl: winter/sso/logs/update/:id
+recordUrl: winter/sso/logs/preview/:id
 
 # Message to display if the list is empty
 noRecordsMessage: backend::lang.list.no_records
