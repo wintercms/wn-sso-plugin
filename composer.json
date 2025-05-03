@@ -22,6 +22,7 @@
         "source": "https://github.com/wintercms/wn-sso-plugin"
     },
     "require": {
+        "winter/wn-backend-module": "~1.2.8",
         "laravel/socialite": "~5.3"
     }
 }
