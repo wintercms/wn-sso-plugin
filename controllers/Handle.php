@@ -196,7 +196,11 @@ class Handle extends Controller
             $remember = false;
         }
 
+        Event::fire("winter.sso.$provider.beforelogin", [$user, $ssoUser]);
+
         $this->authManager->login($user, $remember);
+
+        Event::fire("winter.sso.$provider.afterlogin", [$user, $ssoUser]);
 
         SsoLog::create([
             'provider' => $provider,
