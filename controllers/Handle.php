@@ -196,15 +196,7 @@ class Handle extends Controller
             $remember = false;
         }
 
-        if ($user->methodExists('beforeLogin')) {
-            $user->beforeLogin();
-        }
-
         $this->authManager->login($user, $remember);
-
-        if ($user->methodExists('afterLogin')) {
-            $user->afterLogin();
-        }
 
         SsoLog::create([
             'provider' => $provider,
