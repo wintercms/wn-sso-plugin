@@ -206,12 +206,12 @@ class Handle extends Controller
          *
          * Example usage:
          *
-         *     Event::listen('winter.sso.google.beforelogin', function (\Backend\Models\User $user, \Laravel\Socialite\AbstractUser $ssoUser) {
+         *     Event::listen('winter.sso.google.beforeLogin', function (\Winter\Storm\Auth\Models\User $user, \Laravel\Socialite\AbstractUser $ssoUser) {
          *         //
          *     });
          *
          */
-        Event::fire("winter.sso.$provider.beforelogin", [$user, $ssoUser]);
+        Event::fire("winter.sso.$provider.beforeLogin", [$user, $ssoUser]);
 
         $this->authManager->login($user, $remember);
 
@@ -225,12 +225,12 @@ class Handle extends Controller
          *
          * Example usage:
          *
-         *     Event::listen('winter.sso.google.afterlogin', function (\Backend\Models\User $user, \Laravel\Socialite\AbstractUser $ssoUser) {
+         *     Event::listen('winter.sso.google.afterLogin', function (\Winter\Storm\Auth\Models\User $user, \Laravel\Socialite\AbstractUser $ssoUser) {
          *         //
          *     });
          *
          */
-        Event::fire("winter.sso.$provider.afterlogin", [$user, $ssoUser]);
+        Event::fire("winter.sso.$provider.afterLogin", [$user, $ssoUser]);
 
         SsoLog::create([
             'provider' => $provider,
