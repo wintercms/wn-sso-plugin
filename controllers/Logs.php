@@ -4,6 +4,7 @@ namespace Winter\SSO\Controllers;
 
 use BackendMenu;
 use Backend\Classes\Controller;
+use System\Classes\SettingsManager;
 
 /**
  * Logs Backend Controller
@@ -18,12 +19,15 @@ class Logs extends Controller
         \Backend\Behaviors\ListController::class,
     ];
 
+    public $hiddenActions = ['create', 'update'];
+
     public $requiredPermissions = ['winter.sso.view_logs'];
 
     public function __construct()
     {
         parent::__construct();
 
-        BackendMenu::setContext('Winter.SSO', 'sso', 'logs');
+        BackendMenu::setContext('Winter.System', 'system', 'settings');
+        SettingsManager::setContext('Winter.SSO', 'logs');
     }
 }
