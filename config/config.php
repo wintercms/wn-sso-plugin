@@ -12,8 +12,6 @@ return [
     | When only one provider is enabled, the login page will be redirected
     | to the provider's login page.
     |
-    | @TODO: Implement this
-    |
     */
 
     'prevent_native_auth' => env('SSO_PREVENT_NATIVE_AUTH', false),
@@ -56,8 +54,6 @@ return [
     |
     | If true, will allow users to register for an account using a configured
     | SSO provider. If false, will only allow existing users to login.
-    |
-    | @TODO: Implement this
     |
     */
 
@@ -132,7 +128,6 @@ return [
             'client_secret' => env('LINKEDIN_OPENID_CLIENT_SECRET'),
             'guzzle' => [],
         ],
-
 
         'twitter' => [
             'client_id' => env('TWITTER_CLIENT_ID'),
