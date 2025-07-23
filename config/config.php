@@ -12,8 +12,6 @@ return [
     | When only one provider is enabled, the login page will be redirected
     | to the provider's login page.
     |
-    | @TODO: Implement this
-    |
     */
 
     'prevent_native_auth' => env('SSO_PREVENT_NATIVE_AUTH', false),
