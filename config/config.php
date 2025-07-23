@@ -55,8 +55,6 @@ return [
     | If true, will allow users to register for an account using a configured
     | SSO provider. If false, will only allow existing users to login.
     |
-    | @TODO: Implement this
-    |
     */
 
     'allow_registration' => env('SSO_ALLOW_REGISTRATION', false),
@@ -130,7 +128,6 @@ return [
             'client_secret' => env('LINKEDIN_OPENID_CLIENT_SECRET'),
             'guzzle' => [],
         ],
-
 
         'twitter' => [
             'client_id' => env('TWITTER_CLIENT_ID'),
