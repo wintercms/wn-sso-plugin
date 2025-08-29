@@ -127,6 +127,21 @@ class Handle extends Controller
 
             try {
                 if (Config::get('winter.sso::allow_registration', false)) {
+                    /**
+                     * @event winter.sso.$provider.beforeRegister
+                     * Fires before a User record is registered by the AuthManager
+                     *
+                     * Example usage:
+                     *
+                     *     Event::listen('winter.sso.google.beforeRegister', function (\Laravel\Socialite\AbstractUser $ssoUser) {
+                     *         if (explode('@', $ssoUser->getEmail(), 2)[1] !== 'mydomain.com') {
+                     *             throw new AuthenticationException('Invalid email');
+                     *         }
+                     *     });
+                     *
+                     */
+                    Event::fire("winter.sso.$provider.beforeRegister", [$ssoUser]);
+                    
                     $password = Str::random(400);
                     $user = $this->authManager->register(
                         credentials: [
