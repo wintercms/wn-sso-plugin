@@ -32,6 +32,6 @@ fields:
         label: winter.sso::lang.models.log.provided_email
         span: left
 
-    user_email:
+    user[email]:
         label: winter.sso::lang.models.log.user
         span: auto

@@ -35,9 +35,12 @@ columns:
         sortable: true
         searchable: true
         invisible: false
-    user_email:
+    user[email]:
         label: winter.sso::lang.models.log.user
-        type: partial
-        path: $/winter/sso/models/log/column.user.php
-        clickable: true
-        invisible: true
+
+    # user_email:
+    #     label: winter.sso::lang.models.log.user
+    #     type: partial
+    #     path: $/winter/sso/models/log/column.user.php
+    #     clickable: true
+    #     invisible: true
