@@ -23,6 +23,7 @@
     },
     "require": {
         "winter/wn-backend-module": "^1.2.8 || dev-develop",
-        "laravel/socialite": "~5.3"
+        "laravel/socialite": "~5.3",
+        "socialiteproviders/manager": "^4.0"
     }
 }

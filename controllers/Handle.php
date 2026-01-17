@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
+use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
-use Socialite;
 use Winter\SSO\Exceptions\InvalidSsoIdException;
 use Winter\SSO\Exceptions\ProviderBlockedException;
 use Winter\SSO\Models\Log as SsoLog;
@@ -141,7 +141,7 @@ class Handle extends Controller
                      *
                      */
                     Event::fire("winter.sso.$provider.beforeRegister", [$ssoUser]);
-                    
+
                     $password = Str::random(400);
                     $user = $this->authManager->register(
                         credentials: [

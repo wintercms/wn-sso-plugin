@@ -11,17 +11,18 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\SocialiteServiceProvider;
+use SocialiteProviders\Manager\ServiceProvider as SocialiteManagerServiceProvider;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
-use Url;
 use Winter\Storm\Exception\ApplicationException;
 use Winter\Storm\Support\Facades\Config;
 use Winter\Storm\Support\Facades\Event;
+use Winter\Storm\Support\Facades\Url;
 
 /**
  * SSO Plugin Information File
  * @TODO:
- * - Add backend DB configuration for providers (and all settings)
+ * - Add backend DB configuration for providers (and all settings, include expiration date on secrets for reminders)
  * - Add backend configuration for the user to set their SSO integrations
  */
 class Plugin extends PluginBase
@@ -114,13 +115,15 @@ class Plugin extends PluginBase
      */
     public function boot(): void
     {
-        // Secure sessions with same_site set to strict prevents Socialite's SSO session data from being saved
-        // @TODO: Warn the user about this, perhaps in the system configuration warnings dashboard widget
-        if (Config::get('session.secure') === true && Config::get('session.same_site') === 'strict') {
-            Config::set('session.same_site', 'lax');
-        }
-        $this->configureProviders();
-        $this->extendAuthController();
+        $this->app->booted(function () {
+            // Secure sessions with same_site set to strict prevents Socialite's SSO session data from being saved
+            // @TODO: Warn the user about this, perhaps in the system configuration warnings dashboard widget
+            if (Config::get('session.secure') === true && Config::get('session.same_site') === 'strict') {
+                Config::set('session.same_site', 'lax');
+            }
+            $this->configureProviders();
+            $this->extendAuthController();
+        });
     }
 
     /**
@@ -182,7 +185,7 @@ class Plugin extends PluginBase
             $controller->bindEvent('page.beforeDisplay', function () use ($controller) {
                 $controller->addViewPath(plugins_path('winter/sso/controllers/auth/prevent_native'));
             });
-        
+
             // Disable server processing of any auth AJAX handlers to protect against manually crafted requests
             $controller->bindEvent('ajax.beforeRunHandler', function ($handler) {
                 if ($handler === 'onSubmit') {
@@ -198,6 +201,7 @@ class Plugin extends PluginBase
     protected function registerSocialite(): void
     {
         $this->app->register(SocialiteServiceProvider::class);
+        $this->app->register(SocialiteManagerServiceProvider::class);
         $this->app->alias('Socialite', Socialite::class);
     }
 
