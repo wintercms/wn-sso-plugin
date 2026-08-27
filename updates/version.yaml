@@ -1,3 +1,25 @@
 '1.0.0':
     - 'First version of Winter.SSO'
     - v1.0.0/create_logs_table.php
+
+'2.0.0':
+    - '!!! The SSO callback URL has changed to backend/winter/sso/handle/callback/<provider>. Update the authorized redirect URI registered with each SSO provider before applying this update, or SSO sign in will fail.'
+    - 'Moved the SSO redirect and callback handling out of routes.php and into the Winter\SSO\Controllers\Handle backend controller, removing the winter.sso.redirect and winter.sso.callback named routes.'
+    - 'Replaced the getSsoId() and setSsoId() user model methods with getSsoValue() and setSsoValues().'
+    - 'Renamed the linkedin provider to linkedin-openid to match the Socialite provider name, along with its LINKEDIN_OPENID_CLIENT_ID and LINKEDIN_OPENID_CLIENT_SECRET environment variables.'
+    - 'Made the SSO logs read only and moved them under the Settings area.'
+    - 'Now requires winter/wn-backend-module ^1.2.8 and socialiteproviders/manager ^4.0.'
+    - 'Added SSO provider sign in buttons to the backend sign in page, with configurable view, logo, label and URL per provider.'
+    - 'Added support for the SocialiteProviders manager so that any community provider can be registered by a provider plugin.'
+    - 'Added the allow_registration option to create backend users from a successful SSO authentication.'
+    - 'Added the winter.sso.<provider>.authenticating, authenticated, beforeRegister, registered, beforeLogin and afterLogin events.'
+    - 'Added verification that a returning SSO account ID matches the ID already stored for the user, throwing InvalidSsoIdException on a mismatch.'
+    - 'Added the require_explicit_permission option so a user must explicitly allow a connection from each SSO provider, throwing ProviderBlockedException otherwise.'
+    - 'Implemented the prevent_native_auth option, disabling the native sign in form and rejecting its AJAX handlers server side.'
+    - 'Added canonicalization of provided email addresses before matching them to a backend user.'
+    - 'Relaxed session.same_site from strict to lax when session.secure is enabled, as strict same-site cookies prevent the SSO session from surviving the provider redirect.'
+    - 'Only force the email login attribute on the SSO callback route instead of globally.'
+    - 'Added handling for the OAuth invalid state error and for providers missing a client_id.'
+    - 'Improved the rendering of user emails in the logs list.'
+    - 'Added French translations.'
+    - 'Added architecture and provider plugin authoring documentation.'
